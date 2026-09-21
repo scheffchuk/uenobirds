@@ -49,7 +49,9 @@ export default async function LocaleLayout({
           <Suspense fallback={<SiteFooterFallback />}>
             <LocaleSiteFooter />
           </Suspense>
-          <OfflineIndicator />
+          <Suspense fallback={null}>
+            <OfflineIndicator />
+          </Suspense>
         </div>
       </NextIntlClientProvider>
     </RootShell>

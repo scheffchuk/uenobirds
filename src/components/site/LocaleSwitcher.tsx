@@ -3,8 +3,9 @@
 import { useEffect, useRef } from "react";
 import { LanguagesIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { stripLocalePrefix } from "@/lib/season/canonicalize";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +24,6 @@ function isAppLocale(value: string): value is AppLocale {
 export function LocaleSwitcher({ className }: { className?: string }) {
   const t = useTranslations("LocaleSwitcher");
   const locale = useLocale() as AppLocale;
-  const pathname = usePathname();
   const router = useRouter();
   const mountedAtRef = useRef<number | null>(null);
 
@@ -65,8 +65,9 @@ export function LocaleSwitcher({ className }: { className?: string }) {
             value={locale}
             onValueChange={(next) => {
               if (isAppLocale(next) && next !== locale) {
-                // Preserve query (e.g. ?season=) across Locale hops without
-                // useSearchParams — avoids an extra Suspense boundary here.
+                // window.location — not usePathname / useSearchParams — so
+                // persist chrome can prerender without a remounting Suspense.
+                const pathname = stripLocalePrefix(window.location.pathname);
                 const query = Object.fromEntries(
                   new URLSearchParams(window.location.search).entries(),
                 );
