@@ -197,13 +197,13 @@ test("filters by Season and resets audio when a card leaves the list", async ({
   await winter.getByRole("button", { name: "Play audio" }).click();
   await expect(winter.getByRole("button", { name: "Pause audio" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Summer" }).click();
+  await page.getByRole("link", { name: "Summer", exact: true }).click();
   await expect(page).toHaveURL(/season=summer/);
   await expect(card(page, "Winter Demo Bird")).toHaveCount(0);
   await expect(card(page, "Unavailable Demo Bird")).toHaveCount(0);
   await expect(card(page, "Summer Demo Bird")).toBeVisible();
 
-  await page.getByRole("link", { name: "All year" }).click();
+  await page.getByRole("link", { name: "All year", exact: true }).click();
   await expect(page).toHaveURL(/season=all/);
   const restoredWinter = card(page, "Winter Demo Bird");
   await expect(

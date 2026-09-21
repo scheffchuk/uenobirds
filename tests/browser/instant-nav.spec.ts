@@ -35,7 +35,7 @@ test("Season pills on the Atlas fixture are instant navigations", async ({
   await instant(
     page,
     async () => {
-      await page.getByRole("link", { name: "Summer" }).click();
+      await page.getByRole("link", { name: "Summer", exact: true }).click();
       await page.waitForURL(/test-fixture\?season=summer/);
       await expect(page.getByText("Summer Demo Bird")).toBeVisible();
     },
