@@ -19,9 +19,11 @@ function TrailingFallback() {
 export function LocaleChromeBarFallback({
   className,
   showLeading = true,
+  showTrailing = true,
 }: {
   className?: string;
   showLeading?: boolean;
+  showTrailing?: boolean;
 }) {
   return (
     <div
@@ -33,7 +35,7 @@ export function LocaleChromeBarFallback({
       aria-hidden
     >
       {showLeading ? <LeadingFallback /> : null}
-      <TrailingFallback />
+      {showTrailing ? <TrailingFallback /> : null}
     </div>
   );
 }
@@ -48,11 +50,11 @@ export function LocaleChromeBar({
   className,
 }: {
   leading?: ReactNode;
-  /** Defaults to LocaleSwitcher. */
-  trailing?: ReactNode;
+  /** Defaults to LocaleSwitcher. Pass `null` to hide. */
+  trailing?: ReactNode | null;
   className?: string;
 }) {
-  const end = trailing ?? <LocaleSwitcher />;
+  const end = trailing === undefined ? <LocaleSwitcher /> : trailing;
 
   return (
     <div
@@ -65,7 +67,9 @@ export function LocaleChromeBar({
       {leading ? (
         <Suspense fallback={<LeadingFallback />}>{leading}</Suspense>
       ) : null}
-      <Suspense fallback={<TrailingFallback />}>{end}</Suspense>
+      {end ? (
+        <Suspense fallback={<TrailingFallback />}>{end}</Suspense>
+      ) : null}
     </div>
   );
 }

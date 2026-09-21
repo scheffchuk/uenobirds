@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rootFontClassName } from "@/components/site/root-fonts";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import "@/app/globals.css";
 
 /** Shared document shell for dual root layouts and global-not-found. */
@@ -20,7 +19,7 @@ export function RootShell({
       className={rootFontClassName()}
     >
       <body className="flex min-h-full flex-col antialiased">
-        <TooltipProvider>{children}</TooltipProvider>
+        {children}
         <Analytics />
         <SpeedInsights />
       </body>

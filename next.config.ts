@@ -7,8 +7,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  reactCompiler: true,
+  typedRoutes: true,
   experimental: {
     globalNotFound: true,
+    useOffline: true,
   },
   images: {
     remotePatterns: [

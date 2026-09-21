@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { LocaleChromeBar, LocaleChromeBarFallback } from "@/components/site/LocaleChromeBar";
-import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
-import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { SeasonLink } from "@/components/season/SeasonLink";
+import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { loadMessages } from "@/i18n/load-messages";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -36,8 +34,9 @@ async function AboutChrome() {
   return (
     <LocaleChromeBar
       leading={
-        <SeasonLink pathname="/" backLabel={copy.backToCollage} />
+        <SeasonLink pathname="/" backLabel={copy.backToCollage} prefetch={true} />
       }
+      trailing={null}
     />
   );
 }
@@ -63,18 +62,13 @@ async function AboutBody() {
 
 export default function AboutPage() {
   return (
-    <main className="flex min-h-screen flex-col bg-background text-foreground">
-      <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-6 py-12 md:px-8">
-        <Suspense fallback={<LocaleChromeBarFallback />}>
-          <AboutChrome />
-        </Suspense>
-        <Suspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
-          <AboutBody />
-        </Suspense>
-      </article>
-      <Suspense fallback={<SiteFooterFallback />}>
-        <LocaleSiteFooter />
-      </Suspense>
-    </main>
+    <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-6 py-12 md:px-8">
+      <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
+        <AboutChrome />
+      </AnimatedSuspense>
+      <AnimatedSuspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
+        <AboutBody />
+      </AnimatedSuspense>
+    </article>
   );
 }

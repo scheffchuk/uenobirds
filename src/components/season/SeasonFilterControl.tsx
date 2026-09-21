@@ -1,16 +1,18 @@
-"use client";
-
 import { SeasonPicker } from "@/components/season/SeasonPicker";
-import { useSeasonFilter } from "@/lib/season/use-season-filter";
+import type { SeasonFilter } from "@/lib/season/types";
+import type { SeasonPickerPath } from "@/lib/season/url";
 
-/** Season filter UI bound to shareable `?season=` URL state. */
+/** Season pills bound to shareable `?season=` — navigates, does not client-filter. */
 export function SeasonFilterControl({
+  season,
+  pathname,
   className,
 }: {
+  season: SeasonFilter;
+  pathname: SeasonPickerPath;
   className?: string;
 }) {
-  const { season, setSeason } = useSeasonFilter();
   return (
-    <SeasonPicker value={season} onChange={setSeason} className={className} />
+    <SeasonPicker value={season} pathname={pathname} className={className} />
   );
 }

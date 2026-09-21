@@ -5,6 +5,8 @@ export const CLIENT_MESSAGE_NAMESPACES = [
   "Atlas",
   "AtlasDetail",
   "LocaleSwitcher",
+  "Offline",
+  "Error",
 ] as const;
 
 export type ClientMessageNamespace = (typeof CLIENT_MESSAGE_NAMESPACES)[number];

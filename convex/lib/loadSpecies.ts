@@ -24,24 +24,6 @@ export async function loadPrevalenceForSpecies(
   return prevalence;
 }
 
-function baseListedFields(sp: Doc<"species">) {
-  return {
-    slug: sp.slug,
-    sciName: sp.sciName,
-    comNameEn: sp.comNameEn,
-    comNameJa: sp.comNameJa,
-    comNameZhTw: sp.comNameZhTw,
-    listed: true,
-    illustrationStatus: sp.illustrationStatus,
-    descriptionEn: sp.descriptionEn,
-    descriptionJa: sp.descriptionJa,
-    descriptionZhTw: sp.descriptionZhTw,
-    spottingTipsEn: sp.spottingTipsEn,
-    spottingTipsJa: sp.spottingTipsJa,
-    spottingTipsZhTw: sp.spottingTipsZhTw,
-  };
-}
-
 async function resolveIllustrationUrls(
   ctx: QueryCtx,
   sp: Doc<"species">,
@@ -115,21 +97,6 @@ export async function resolveAudio(
     ...(audio.bytes !== undefined ? { bytes: audio.bytes } : {}),
     ...(audio.contentType ? { contentType: audio.contentType } : {}),
   };
-}
-
-export async function loadListedSpecies(ctx: QueryCtx) {
-  const listed = await ctx.db
-    .query("species")
-    .withIndex("by_listed", (q) => q.eq("listed", true))
-    .collect();
-
-  return await Promise.all(
-    listed.map(async (sp) => ({
-      ...baseListedFields(sp),
-      prevalence: await loadPrevalenceForSpecies(ctx, sp._id),
-      ...(await resolveIllustrationUrls(ctx, sp)),
-    })),
-  );
 }
 
 /** Listed Guide species for Atlas list — one card URL, no copy fields. */

@@ -12,6 +12,8 @@ describe("pickClientMessages", () => {
       Atlas: { title: "Atlas" },
       AtlasDetail: { prevalence: "Prevalence" },
       LocaleSwitcher: { label: "Language" },
+      Offline: { message: "offline" },
+      Error: { title: "err" },
       About: { title: "About" },
       Meta: { title: "Meta" },
       Nav: { atlas: "Atlas" },

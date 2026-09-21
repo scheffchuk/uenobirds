@@ -5,20 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRoot, type Root } from "react-dom/client";
 import { AtlasSpeciesCard } from "./AtlasSpeciesCard";
 
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) =>
-    ({
-      playAudio: "Play audio",
-      pauseAudio: "Pause audio",
-      loadingAudio: "Loading audio",
-      retryAudio: "Retry audio",
-      audioUnavailable: "Audio unavailable",
-      wikipedia: "Wikipedia",
-      ebird: "eBird",
-      opensNewTab: "opens in a new tab",
-    })[key] ?? key,
-}));
-
 vi.mock("@/i18n/navigation", () => ({
   Link: ({
     href,
@@ -34,6 +20,11 @@ vi.mock("@/i18n/navigation", () => ({
   ),
 }));
 
+vi.mock("@/components/site/species-art-transition", () => ({
+  SpeciesArtTransition: ({ children }: { children: React.ReactNode }) =>
+    children,
+}));
+
 const wikipedia = {
   en: "https://en.wikipedia.org/wiki/Tree_sparrow",
   ja: "https://ja.wikipedia.org/wiki/スズメ",
@@ -43,6 +34,17 @@ const wikipedia = {
 const ebird = {
   speciesCode: "eurtrs1",
   url: "https://ebird.org/species/eurtrs1",
+};
+
+const labels = {
+  play: "Play audio",
+  pause: "Pause audio",
+  loading: "Loading audio",
+  retry: "Retry audio",
+  unavailable: "Audio unavailable",
+  wikipedia: "Wikipedia",
+  ebird: "eBird",
+  opensNewTab: "opens in a new tab",
 };
 
 let roots: Array<{ root: Root; container: HTMLDivElement }> = [];
@@ -69,6 +71,7 @@ function renderCard() {
         }}
         wikipedia={wikipedia}
         ebird={ebird}
+        labels={labels}
       />,
     );
   });
