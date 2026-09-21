@@ -35,6 +35,9 @@ export function resolveSeasonFilter(
 /** Paths that may carry a Season filter query. */
 export type SeasonHrefPath = "/" | "/atlas" | `/atlas/${string}`;
 
+/** Collage, Atlas list, and the Atlas Playwright fixture. */
+export type SeasonPickerPath = "/" | "/atlas" | "/atlas/test-fixture";
+
 /** Pathname, or pathname + `?season=` when a filter is present (including all). */
 export function hrefWithSeason(
   pathname: SeasonHrefPath,

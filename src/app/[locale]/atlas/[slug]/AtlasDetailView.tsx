@@ -7,6 +7,7 @@ import {
   nameStackForLocale,
 } from "@/lib/locale/species";
 import { SeasonLink } from "@/components/season/SeasonLink";
+import { SpeciesArtTransition } from "@/components/site/species-art-transition";
 import { PrevalenceChart } from "./PrevalenceChart";
 import type { AppLocale } from "@/i18n/routing";
 import { wikipediaUrlForLocale } from "@/lib/audio/links";
@@ -52,15 +53,17 @@ export async function AtlasDetailView({
           {species.perchUrl ? (
             <figure className="flex flex-col items-center gap-2">
               <div className="relative aspect-square w-full max-w-xs">
-                <Image
-                  src={species.perchUrl}
-                  alt={t("altPerched", { name: stack.primary })}
-                  fill
-                  sizes="320px"
-                  className="object-contain"
-                  loading="eager"
-                  fetchPriority="high"
-                />
+                <SpeciesArtTransition slug={species.slug}>
+                  <Image
+                    src={species.perchUrl}
+                    alt={t("altPerched", { name: stack.primary })}
+                    fill
+                    sizes="320px"
+                    className="object-contain"
+                    loading="eager"
+                    fetchPriority="high"
+                  />
+                </SpeciesArtTransition>
               </div>
               <figcaption className="font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase">
                 {t("perched")}

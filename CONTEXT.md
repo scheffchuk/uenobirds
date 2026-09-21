@@ -13,7 +13,7 @@ One of the four meteorological windows used for Prevalence: Winter (Dec–Feb), 
 _Avoid_: time window, period, all-year
 
 **Season filter**:
-The collage/atlas filter: a Season or All-year. All-year sizes and includes species by seasonal-max Prevalence. When the visitor has not chosen a filter (or the choice is invalid), the effective filter is the current Season in Asia/Tokyo — not All-year. All-year is only active when explicitly chosen.
+The collage/atlas filter: a Season or All-year. All-year sizes and includes species by seasonal-max Prevalence. Collage home and the Atlas list always carry an explicit `?season=` query. Missing or invalid `?season=` on those routes **redirects** (307) to the current Season in Asia/Tokyo — never All-year. All-year is only active when the URL says `all`. A shared `/en` opened in January becomes January’s Season; a pinned Season is one whose query is present.
 _Avoid_: season param, default season, current season tab
 
 **Slug**:

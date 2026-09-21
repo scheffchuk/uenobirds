@@ -112,8 +112,8 @@ function layoutForSeason(birds: CollageBird[]): SeasonLayout {
 }
 
 /**
- * Pack every Season up front so the client can switch without a roundtrip and
- * without shipping the packer. Art is listed once and referenced by Slug.
+ * Pack every Season into one cache entry. The page sends one Season's tiles
+ * and matching art; the packer never ships to the client.
  */
 export function buildCollageLayouts(species: CollageSpecies[]): CollageLayouts {
   const art = new Map<string, CollageArt>();

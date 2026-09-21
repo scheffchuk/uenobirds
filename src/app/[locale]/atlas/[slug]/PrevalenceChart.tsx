@@ -1,17 +1,15 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import type { SeasonalPrevalence } from "@/lib/guide/types";
 import { SEASONS } from "@/lib/season/types";
 
 /** Four-bar Season Prevalence chart (0–100). */
-export function PrevalenceChart({
+export async function PrevalenceChart({
   prevalence,
 }: {
   prevalence: SeasonalPrevalence;
 }) {
-  const t = useTranslations("Season");
-  const tDetail = useTranslations("AtlasDetail");
+  const t = await getTranslations("Season");
+  const tDetail = await getTranslations("AtlasDetail");
 
   return (
     <div

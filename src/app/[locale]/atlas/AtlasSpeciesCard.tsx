@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import { ExternalLinkIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import {
   Card,
   CardDescription,
@@ -10,10 +7,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "@/i18n/navigation";
+import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { hrefWithSeason } from "@/lib/season/url";
 import type { SeasonFilter } from "@/lib/season/types";
-import { AtlasAudioControl } from "@/components/atlas/AtlasAudioControl";
+import {
+  AtlasAudioControl,
+  type AtlasAudioLabels,
+} from "@/components/atlas/AtlasAudioControl";
+import { SpeciesArtTransition } from "@/components/site/species-art-transition";
 import { wikipediaUrlForLocale } from "@/lib/audio/links";
 import type {
   PublicAudio,
@@ -21,6 +22,12 @@ import type {
   PublicWikipediaLinks,
 } from "@/lib/audio/types";
 import type { AppLocale } from "@/i18n/routing";
+
+export type AtlasSpeciesCardLabels = AtlasAudioLabels & {
+  wikipedia: string;
+  ebird: string;
+  opensNewTab: string;
+};
 
 export function AtlasSpeciesCard({
   slug,
@@ -33,33 +40,25 @@ export function AtlasSpeciesCard({
   audio,
   ebird,
   wikipedia,
-  onPlayRequest,
-  onPause,
-  onEnded,
-  onError,
-  onAudioElement,
+  labels,
 }: {
   slug: string;
   comName: string;
   sciName: string;
   imageUrl?: string;
   index: number;
-  season?: SeasonFilter;
+  season: SeasonFilter;
   locale: AppLocale;
   audio?: PublicAudio;
   ebird?: PublicEbirdLink;
   wikipedia?: PublicWikipediaLinks;
-  onPlayRequest?: (audio: HTMLAudioElement) => void;
-  onPause?: () => void;
-  onEnded?: () => void;
-  onError?: () => void;
-  onAudioElement?: (audio: HTMLAudioElement | null) => void;
+  labels: AtlasSpeciesCardLabels;
 }) {
-  const t = useTranslations("Atlas");
   const delayMs = Math.min(index, 12) * 40;
   const detailHref = hrefWithSeason(`/atlas/${slug}`, season);
   const wikipediaUrl = wikipediaUrlForLocale(wikipedia, locale);
   const hasAudio = audio?.status === "available" && Boolean(audio.url);
+  const eager = index < 4;
 
   return (
     <Card
@@ -67,22 +66,25 @@ export function AtlasSpeciesCard({
       className="atlas-card-enter h-full overflow-hidden ring-0 shadow-[var(--raised)]"
       style={{ animationDelay: `${delayMs}ms` }}
     >
-      <Link
+      <HoverPrefetchLink
+        eager={eager}
         href={detailHref}
         className="atlas-card-detail block rounded-t-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <div className="px-(--card-spacing) pt-(--card-spacing)">
           <div className="relative aspect-square w-full overflow-hidden">
             {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={comName}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 288px"
-                loading={index < 4 ? "eager" : "lazy"}
-                fetchPriority={index === 0 ? "high" : "auto"}
-                className="atlas-card-specimen object-contain"
-              />
+              <SpeciesArtTransition slug={slug}>
+                <Image
+                  src={imageUrl}
+                  alt={comName}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 288px"
+                  loading={eager ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  className="atlas-card-specimen object-contain"
+                />
+              </SpeciesArtTransition>
             ) : (
               <div
                 className="atlas-card-specimen absolute inset-[12%] rounded-[40%_40%_35%_35%] bg-silhouette/25"
@@ -96,7 +98,7 @@ export function AtlasSpeciesCard({
             {comName}
           </CardTitle>
         </CardHeader>
-      </Link>
+      </HoverPrefetchLink>
       <div className="-mt-2 px-(--card-spacing)">
         <CardDescription className="truncate text-xs text-ink-soft italic">
           {sciName}
@@ -105,20 +107,16 @@ export function AtlasSpeciesCard({
       <Separator className="mx-auto w-[90%] self-center bg-hairline opacity-50 data-horizontal:w-[90%]" />
       <div className="flex items-center justify-between px-3 py-2">
         <AtlasAudioControl
+          slug={slug}
           audioUrl={audio?.url}
           available={hasAudio}
           labels={{
-            play: t("playAudio"),
-            pause: t("pauseAudio"),
-            loading: t("loadingAudio"),
-            retry: t("retryAudio"),
-            unavailable: t("audioUnavailable"),
+            play: labels.play,
+            pause: labels.pause,
+            loading: labels.loading,
+            retry: labels.retry,
+            unavailable: labels.unavailable,
           }}
-          onPlayRequest={onPlayRequest}
-          onPause={onPause}
-          onEnded={onEnded}
-          onError={onError}
-          onAudioElement={onAudioElement}
         />
         <div className="flex items-center gap-1">
           {wikipediaUrl ? (
@@ -126,10 +124,10 @@ export function AtlasSpeciesCard({
               href={wikipediaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${t("wikipedia")} (${t("opensNewTab")})`}
+              aria-label={`${labels.wikipedia} (${labels.opensNewTab})`}
               className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[0.7rem] text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              <span>{t("wikipedia")}</span>
+              <span>{labels.wikipedia}</span>
               <ExternalLinkIcon aria-hidden className="size-3" />
             </a>
           ) : null}
@@ -138,10 +136,10 @@ export function AtlasSpeciesCard({
               href={ebird.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${t("ebird")} (${t("opensNewTab")})`}
+              aria-label={`${labels.ebird} (${labels.opensNewTab})`}
               className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[0.7rem] text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              <span>{t("ebird")}</span>
+              <span>{labels.ebird}</span>
               <ExternalLinkIcon aria-hidden className="size-3" />
             </a>
           ) : null}

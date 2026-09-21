@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { AtlasListView } from "../AtlasListView";
 import type { AtlasListSource } from "@/lib/atlas/select";
+import { requireSeasonParam, type SeasonSearch } from "@/lib/season/require-param";
+import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 
 const browserFixtureSpecies: AtlasListSource[] = [
   {
@@ -63,17 +64,31 @@ const browserFixtureSpecies: AtlasListSource[] = [
   },
 ];
 
+async function FixtureList({
+  searchParams,
+}: {
+  searchParams: Promise<SeasonSearch>;
+}) {
+  const params = await searchParams;
+  const season = await requireSeasonParam(params, "/atlas/test-fixture");
+  return <AtlasListView species={browserFixtureSpecies} season={season} pickerPath="/atlas/test-fixture" />;
+}
+
 /** Dev-only fixture for the Playwright Atlas interaction tests. */
-export default function AtlasBrowserFixturePage() {
+export default function AtlasBrowserFixturePage({
+  searchParams,
+}: {
+  searchParams: Promise<SeasonSearch>;
+}) {
   if (process.env.BROWSER_TEST_FIXTURES !== "1") notFound();
 
   return (
-    <main className="min-h-screen bg-background px-6 py-10 text-foreground">
+    <main className="min-h-0 flex-1 bg-background px-6 py-10 text-foreground">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
         <h1 className="font-heading text-2xl text-ink">Atlas browser fixture</h1>
-        <Suspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
-          <AtlasListView species={browserFixtureSpecies} />
-        </Suspense>
+        <AnimatedSuspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
+          <FixtureList searchParams={searchParams} />
+        </AnimatedSuspense>
       </div>
     </main>
   );

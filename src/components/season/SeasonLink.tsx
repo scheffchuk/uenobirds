@@ -3,7 +3,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { ArrowLeftIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { FastLink } from "@/components/ui/fast-link";
 import { hrefWithSeason, type SeasonHrefPath } from "@/lib/season/url";
 import { useSeasonQuery } from "@/lib/season/use-season-filter";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,9 @@ export type SeasonLinkProps = {
   | { backLabel: string; children?: never }
   | { backLabel?: undefined; children: ReactNode }
 ) &
-  Omit<ComponentProps<typeof Link>, "href" | "children">;
+  Omit<ComponentProps<typeof FastLink>, "href" | "children">;
 
-/** next-intl Link that carries `?season=` when present in the current URL. */
+/** next-intl FastLink that carries `?season=` when present in the current URL. */
 export function SeasonLink({
   pathname,
   children,
@@ -30,7 +30,7 @@ export function SeasonLink({
 
   if (backLabel) {
     return (
-      <Link
+      <FastLink
         href={href}
         className={cn(
           buttonVariants({ variant: "ghost", size: "icon" }),
@@ -41,13 +41,13 @@ export function SeasonLink({
         aria-label={backLabel}
       >
         <ArrowLeftIcon />
-      </Link>
+      </FastLink>
     );
   }
 
   return (
-    <Link href={href} className={className} {...rest}>
+    <FastLink href={href} className={className} {...rest}>
       {children}
-    </Link>
+    </FastLink>
   );
 }

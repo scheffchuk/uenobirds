@@ -98,5 +98,13 @@
     "source": "Source recording",
     "license": "Licence",
     "none": "Audio credits will appear here after the first selection run."
+  },
+  "Offline": {
+    "message": "You're offline — reconnecting"
+  },
+  "Error": {
+    "title": "Something went wrong",
+    "body": "This page could not be loaded. Please try again.",
+    "retry": "Try again"
   }
 }

@@ -3,6 +3,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useAuthToken } from "@convex-dev/auth/react";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import type { Route } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -33,10 +34,13 @@ export function AdminPageClient() {
           </p>
         </div>
         <nav className="flex items-center gap-3 text-sm">
-          <Link href="/" className="underline-offset-4 hover:underline">
+          <Link href={"/" as Route} className="underline-offset-4 hover:underline">
             Collage
           </Link>
-          <Link href="/atlas" className="underline-offset-4 hover:underline">
+          <Link
+            href={"/atlas" as Route}
+            className="underline-offset-4 hover:underline"
+          >
             Atlas
           </Link>
           {isAuthenticated ? (

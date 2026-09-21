@@ -1,9 +1,8 @@
-"use client";
-
-import { useCallback, useEffect, useRef } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { SeasonFilterControl } from "@/components/season/SeasonFilterControl";
+import type { SeasonPickerPath } from "@/lib/season/url";
 import { AtlasSpeciesCard } from "./AtlasSpeciesCard";
+import { AtlasPlaybackProvider } from "@/components/atlas/AtlasPlaybackProvider";
 import {
   Empty,
   EmptyDescription,
@@ -11,64 +10,46 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { selectForAtlas, type AtlasListSource } from "@/lib/atlas/select";
-import {
-  useSeasonFilter,
-  useSeasonQuery,
-} from "@/lib/season/use-season-filter";
 import { commonNameForLocale } from "@/lib/locale/species";
+import type { SeasonFilter } from "@/lib/season/types";
 import type { AppLocale } from "@/i18n/routing";
-import { AudioPlaybackCoordinator } from "@/lib/audio/playback";
 
-/** Client Season filter + list — same `?season=` model as the collage. */
-export function AtlasListView({
+/** Server-filtered Atlas list. Season picker and audio stay client islands. */
+export async function AtlasListView({
   species,
+  season,
+  pickerPath = "/atlas",
 }: {
   species: AtlasListSource[];
+  season: SeasonFilter;
+  pickerPath?: SeasonPickerPath;
 }) {
-  const t = useTranslations("Atlas");
-  const tSeason = useTranslations("Season");
-  const locale = useLocale() as AppLocale;
-  const { season } = useSeasonFilter();
-  const seasonQuery = useSeasonQuery();
+  const [t, tSeason, localeRaw] = await Promise.all([
+    getTranslations("Atlas"),
+    getTranslations("Season"),
+    getLocale(),
+  ]);
+  const locale = localeRaw as AppLocale;
   const rows = selectForAtlas(species, season);
-  const playback = useRef(new AudioPlaybackCoordinator());
-
-  const registerAudio = useCallback(
-    (slug: string, audio: HTMLAudioElement | null) => {
-      playback.current.register(slug, audio);
-    },
-    [],
-  );
-
-  const requestPlay = useCallback(
-    (slug: string) => {
-      playback.current.requestPlay(slug);
-    },
-    [],
-  );
-
-  const releasePlayback = useCallback(
-    (slug: string) => {
-      playback.current.release(slug);
-    },
-    [],
-  );
-
-  useEffect(
-    () => () => {
-      playback.current.dispose();
-    },
-    [],
-  );
+  const cardLabels = {
+    play: t("playAudio"),
+    pause: t("pauseAudio"),
+    loading: t("loadingAudio"),
+    retry: t("retryAudio"),
+    unavailable: t("audioUnavailable"),
+    wikipedia: t("wikipedia"),
+    ebird: t("ebird"),
+    opensNewTab: t("opensNewTab"),
+  };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="group flex flex-col gap-8">
       <p className="text-center text-sm text-ink-soft">
         {t("subtitle", { season: tSeason(season) })}
       </p>
 
       <div className="flex justify-center">
-        <SeasonFilterControl />
+        <SeasonFilterControl season={season} pathname={pickerPath} />
       </div>
 
       {rows.length === 0 ? (
@@ -81,29 +62,27 @@ export function AtlasListView({
           </EmptyHeader>
         </Empty>
       ) : (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-          {rows.map((row, index) => (
-            <li key={row.slug}>
-              <AtlasSpeciesCard
-                slug={row.slug}
-                comName={commonNameForLocale(row, locale)}
-                sciName={row.sciName}
-                imageUrl={row.imageUrl}
-                index={index}
-                season={seasonQuery}
-                locale={locale}
-                audio={row.audio}
-                ebird={row.ebird}
-                wikipedia={row.wikipedia}
-                onPlayRequest={() => requestPlay(row.slug)}
-                onPause={() => releasePlayback(row.slug)}
-                onEnded={() => releasePlayback(row.slug)}
-                onError={() => releasePlayback(row.slug)}
-                onAudioElement={(audio) => registerAudio(row.slug, audio)}
-              />
-            </li>
-          ))}
-        </ul>
+        <AtlasPlaybackProvider>
+          <ul className="grid grid-cols-1 gap-4 group-has-[[data-filtering]]:opacity-60 group-has-[[data-filtering]]:transition-opacity sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+            {rows.map((row, index) => (
+              <li key={row.slug}>
+                <AtlasSpeciesCard
+                  slug={row.slug}
+                  comName={commonNameForLocale(row, locale)}
+                  sciName={row.sciName}
+                  imageUrl={row.imageUrl}
+                  index={index}
+                  season={season}
+                  locale={locale}
+                  audio={row.audio}
+                  ebird={row.ebird}
+                  wikipedia={row.wikipedia}
+                  labels={cardLabels}
+                />
+              </li>
+            ))}
+          </ul>
+        </AtlasPlaybackProvider>
       )}
     </div>
   );

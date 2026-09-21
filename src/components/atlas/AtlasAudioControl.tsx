@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAtlasPlayback } from "@/components/atlas/AtlasPlaybackProvider";
 
 type AudioControlState = "idle" | "loading" | "playing" | "paused" | "error";
 
@@ -25,6 +27,7 @@ export type AtlasAudioLabels = {
 };
 
 export function AtlasAudioControl({
+  slug,
   audioUrl,
   available,
   labels,
@@ -34,6 +37,7 @@ export function AtlasAudioControl({
   onError,
   onAudioElement,
 }: {
+  slug?: string;
   audioUrl?: string;
   available: boolean;
   labels: AtlasAudioLabels;
@@ -43,6 +47,7 @@ export function AtlasAudioControl({
   onError?: () => void;
   onAudioElement?: (audio: HTMLAudioElement | null) => void;
 }) {
+  const playback = useAtlasPlayback();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const onAudioElementRef = useRef(onAudioElement);
   const playAttempt = useRef(0);
@@ -56,8 +61,9 @@ export function AtlasAudioControl({
     (audio: HTMLAudioElement | null) => {
       audioRef.current = audio;
       onAudioElementRef.current?.(audio);
+      if (slug) playback?.register(slug, audio);
     },
-    [],
+    [playback, slug],
   );
 
   useEffect(() => {
@@ -71,8 +77,9 @@ export function AtlasAudioControl({
         audio.load();
       }
       onAudioElementRef.current?.(null);
+      if (slug) playback?.register(slug, null);
     };
-  }, []);
+  }, [playback, slug]);
 
   const resetSource = useCallback(() => {
     const audio = audioRef.current;
@@ -91,6 +98,7 @@ export function AtlasAudioControl({
       playAttempt.current += 1;
       audio.pause();
       setState("paused");
+      if (slug) playback?.release(slug);
       onPause?.();
       return;
     }
@@ -100,6 +108,7 @@ export function AtlasAudioControl({
       setState("idle");
     }
 
+    if (slug) playback?.requestPlay(slug);
     onPlayRequest?.(audio);
     if (!audio.getAttribute("src")) {
       audio.src = audioUrl;
@@ -122,7 +131,9 @@ export function AtlasAudioControl({
     onError,
     onPause,
     onPlayRequest,
+    playback,
     resetSource,
+    slug,
     state,
   ]);
 
@@ -148,7 +159,7 @@ export function AtlasAudioControl({
             : AudioLinesIcon;
 
   return (
-    <>
+    <TooltipProvider>
       <Tooltip>
         <TooltipTrigger render={<span className="inline-flex" />}>
           <Button
@@ -187,14 +198,16 @@ export function AtlasAudioControl({
             audio.load();
           }
           setState("idle");
+          if (slug) playback?.release(slug);
           onEnded?.();
         }}
         onError={() => {
           playAttempt.current += 1;
           setState("error");
+          if (slug) playback?.release(slug);
           onError?.();
         }}
       />
-    </>
+    </TooltipProvider>
   );
 }

@@ -1,25 +1,34 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { isSeasonFilter, SEASON_FILTERS } from "@/lib/season/url";
+import { FastLink } from "@/components/ui/fast-link";
 import type { SeasonFilter } from "@/lib/season/types";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  hrefWithSeason,
+  SEASON_FILTERS,
+  type SeasonPickerPath,
+} from "@/lib/season/url";
 import { cn } from "@/lib/utils";
 
-/** Presentational Season filter toggle — private to the Season UI module. */
+/** Season pills as FastLink navigations — prefetch all five. */
 export function SeasonPicker({
   value,
-  onChange,
+  pathname,
   className,
 }: {
   value: SeasonFilter;
-  onChange: (next: SeasonFilter) => void;
+  pathname: SeasonPickerPath;
   className?: string;
 }) {
   const t = useTranslations("Season");
   const trackRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
+  const [pendingFor, setPendingFor] = useState<SeasonFilter | null>(null);
+  if (pendingFor === value) {
+    setPendingFor(null);
+  }
+  const pending = pendingFor !== null && pendingFor !== value;
 
   useLayoutEffect(() => {
     const track = trackRef.current;
@@ -36,15 +45,17 @@ export function SeasonPicker({
     sync();
     const ro = new ResizeObserver(sync);
     ro.observe(track);
-    for (const btn of track.querySelectorAll("button")) {
-      ro.observe(btn);
+    for (const link of track.querySelectorAll("a")) {
+      ro.observe(link);
     }
     return () => ro.disconnect();
   }, [value]);
 
   return (
-    <div
+    <nav
       ref={trackRef}
+      aria-label={t("ariaLabel")}
+      data-filtering={pending || undefined}
       className={cn(
         "relative inline-flex h-8 items-center rounded-full bg-paper-2 p-1 shadow-(--recess)",
         className,
@@ -55,32 +66,22 @@ export function SeasonPicker({
         aria-hidden
         className="pointer-events-none absolute inset-y-1 left-0 z-0 rounded-full bg-background shadow-(--raised) transition-[transform,width] duration-[320ms] ease-[cubic-bezier(0.7,0.05,0.2,1)] will-change-[transform,width]"
       />
-      <ToggleGroup
-        value={[value]}
-        onValueChange={(next) => {
-          const selected = next[0];
-          if (selected && isSeasonFilter(selected)) {
-            onChange(selected);
-          }
-        }}
-        variant="default"
-        size="sm"
-        spacing={0}
-        aria-label={t("ariaLabel")}
-        className="z-10 h-full items-stretch gap-0 rounded-full bg-transparent p-0 shadow-none"
-      >
-        {SEASON_FILTERS.map((id) => (
-          <ToggleGroupItem
+      {SEASON_FILTERS.map((id) => {
+        const active = id === value;
+        return (
+          <FastLink
             key={id}
-            value={id}
+            href={hrefWithSeason(pathname, id)}
+            replace
+            prefetch={true}
             aria-label={t(id)}
+            aria-current={active ? "page" : undefined}
+            data-pressed={active ? "" : undefined}
+            onPressNavigate={() => setPendingFor(id)}
             className={cn(
-              "relative z-10 h-full min-h-0 min-w-0 rounded-full border-0 bg-transparent py-0 font-mono text-[10px] leading-none text-ink-soft uppercase shadow-none",
-              "inline-flex items-center justify-center",
-              "px-3 group-data-[spacing=0]/toggle-group:rounded-full group-data-[spacing=0]/toggle-group:px-3",
-              "group-data-horizontal/toggle-group:data-[spacing=0]:first:rounded-full group-data-horizontal/toggle-group:data-[spacing=0]:last:rounded-full",
-              "hover:bg-transparent hover:text-ink",
-              "aria-pressed:bg-transparent aria-pressed:text-ink data-pressed:bg-transparent data-pressed:text-ink data-pressed:shadow-none",
+              "relative z-10 inline-flex h-full min-h-0 min-w-0 items-center justify-center rounded-full px-3 font-mono text-[10px] leading-none text-ink-soft uppercase",
+              "hover:text-ink",
+              active && "text-ink",
             )}
           >
             <span className="hidden tracking-[0.14em] pl-[0.14em] sm:inline">
@@ -89,9 +90,9 @@ export function SeasonPicker({
             <span className="tracking-[0.14em] pl-[0.14em] sm:hidden">
               {t(`short.${id}`)}
             </span>
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
-    </div>
+          </FastLink>
+        );
+      })}
+    </nav>
   );
 }
