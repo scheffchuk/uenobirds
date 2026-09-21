@@ -13,9 +13,13 @@ test("audio credits have a localized route and locale toggle", async ({
     page.getByRole("link", { name: "About" }),
   ).toHaveAttribute("href", "/en/about");
 
-  // LocaleSwitcher ignores clicks during the first 400ms of hydration.
-  await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Language" }).click();
+  const language = page.getByRole("button", { name: "Language" });
+  await expect(language).toBeVisible();
+  // LocaleSwitcher cancels opens in the first 400ms after mount.
+  await expect(async () => {
+    await language.click();
+    await expect(page.getByRole("menuitemradio", { name: "日本語" })).toBeVisible();
+  }).toPass();
   await page.getByRole("menuitemradio", { name: "日本語" }).click();
 
   await expect(page).toHaveURL(/\/ja\/audio$/);

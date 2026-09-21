@@ -42,7 +42,7 @@ export function LocaleChromeBarFallback({
 
 /**
  * Public Locale toolbar: optional leading control + trailing (LocaleSwitcher by default).
- * Suspense wraps both slots so SeasonLink / useSearchParams never block the shell.
+ * Suspense wraps leading so SeasonLink / useSearchParams never remount the switcher.
  */
 export function LocaleChromeBar({
   leading,
@@ -67,9 +67,7 @@ export function LocaleChromeBar({
       {leading ? (
         <Suspense fallback={<LeadingFallback />}>{leading}</Suspense>
       ) : null}
-      {end ? (
-        <Suspense fallback={<TrailingFallback />}>{end}</Suspense>
-      ) : null}
+      {end}
     </div>
   );
 }
