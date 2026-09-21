@@ -1,0 +1,14 @@
+{
+  "name": "Birds in Ueno",
+  "install": "pnpm install --frozen-lockfile && pnpm exec playwright install chromium",
+  "terminals": [
+    {
+      "name": "convex",
+      "command": "CONVEX_AGENT_MODE=anonymous pnpm exec convex dev"
+    },
+    {
+      "name": "next",
+      "command": "until [ -f .env.local ] && grep -q NEXT_PUBLIC_CONVEX_URL .env.local; do sleep 1; done; pnpm dev"
+    }
+  ]
+}
