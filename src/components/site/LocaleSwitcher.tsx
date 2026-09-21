@@ -23,14 +23,20 @@ function isAppLocale(value: string): value is AppLocale {
   return (routing.locales as readonly string[]).includes(value);
 }
 
+/** First mount only — remounts from a prerender Suspense must not reset this. */
+let switcherMountedAt: number | null = null;
+
 export function LocaleSwitcher({ className }: { className?: string }) {
   const t = useTranslations("LocaleSwitcher");
   const locale = useLocale() as AppLocale;
   const router = useRouter();
-  const mountedAtRef = useRef<number | null>(null);
+  const mountedAtRef = useRef(switcherMountedAt);
 
   useEffect(() => {
-    mountedAtRef.current = performance.now();
+    if (switcherMountedAt === null) {
+      switcherMountedAt = performance.now();
+    }
+    mountedAtRef.current = switcherMountedAt;
   }, []);
 
   return (

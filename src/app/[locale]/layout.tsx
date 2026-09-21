@@ -3,7 +3,10 @@ import { Suspense } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { RootShell } from "@/components/site/RootShell";
-import { LocaleChromeBar } from "@/components/site/LocaleChromeBar";
+import {
+  LocaleChromeBar,
+  LocaleChromeBarFallback,
+} from "@/components/site/LocaleChromeBar";
 import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
 import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { OfflineIndicator } from "@/components/site/offline-indicator";
@@ -43,7 +46,11 @@ export default async function LocaleLayout({
             className="fixed top-4 right-4 z-40 md:top-5 md:right-7"
             style={{ viewTransitionName: "site-header" }}
           >
-            <LocaleChromeBar />
+            <Suspense
+              fallback={<LocaleChromeBarFallback showLeading={false} />}
+            >
+              <LocaleChromeBar />
+            </Suspense>
           </div>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
           <Suspense fallback={<SiteFooterFallback />}>
