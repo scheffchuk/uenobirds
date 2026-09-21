@@ -50,13 +50,7 @@ yarn-error.log*
 next-env.d.ts
 /.swc
 
-# local agent scratch; committed project skills are un-ignored
-.agents/*
-!.agents/skills/
-!.agents/skills/**
-
-.claude/*
-!.claude/skills/
-!.claude/skills/**
+.agents/
+.claude/
 
 temp/
