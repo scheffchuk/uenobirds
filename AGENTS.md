@@ -10,6 +10,8 @@ Use **shadcn/ui** primitives (`pnpm dlx shadcn@latest add …`) for interactive 
 
 ## Agent skills
 
+Copied into `.agents/skills/` (Cursor) and `.claude/skills/` (Claude Code). Lock: `skills-lock.json`. Update with `pnpm dlx skills@latest update`. Add a package with `pnpm dlx skills@latest add <pkg> --skill '*' --agent cursor --agent claude-code --copy -y` — do not use `--all` (that installs to every agent folder on disk).
+
 ### Issue tracker
 
 GitHub Issues via the `gh` CLI (`scheffchuk/birds-in-ueno-park`). See `docs/agents/issue-tracker.md`.
