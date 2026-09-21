@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import { LanguagesIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import type { Route } from "next";
+import { useRouter } from "next/navigation";
+import { getPathname } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { stripLocalePrefix } from "@/lib/season/canonicalize";
 import { Button } from "@/components/ui/button";
@@ -65,17 +67,21 @@ export function LocaleSwitcher({ className }: { className?: string }) {
             value={locale}
             onValueChange={(next) => {
               if (isAppLocale(next) && next !== locale) {
-                // window.location — not usePathname / useSearchParams — so
-                // persist chrome can prerender without a remounting Suspense.
+                // next-intl useRouter/usePathname suspend. Persist chrome
+                // builds the hop from window.location so the switcher stays
+                // mounted and Cache Components can prerender the layout.
                 const pathname = stripLocalePrefix(window.location.pathname);
                 const query = Object.fromEntries(
                   new URLSearchParams(window.location.search).entries(),
                 );
                 router.replace(
-                  Object.keys(query).length > 0
-                    ? { pathname, query }
-                    : pathname,
-                  { locale: next },
+                  getPathname({
+                    href:
+                      Object.keys(query).length > 0
+                        ? { pathname, query }
+                        : pathname,
+                    locale: next,
+                  }) as Route,
                 );
               }
             }}
