@@ -84,10 +84,52 @@ async function AtlasSpeciesBody({
 
 function AtlasDetailSkeleton() {
   return (
-    <div className="flex flex-col gap-10" aria-hidden>
-      <div className="h-10 w-2/3 bg-paper-2" />
-      <div className="aspect-square w-full max-w-xs bg-paper-2" />
-      <div className="h-24 w-full bg-paper-2" />
+    <div className="flex flex-1 flex-col gap-10" aria-hidden>
+      <div className="flex flex-col gap-2">
+        <div className="h-9 w-2/3 rounded-lg bg-paper-2 shadow-(--recess) md:h-10" />
+        <div className="h-6 w-1/3 rounded-md bg-paper-2 shadow-(--recess)" />
+        <div className="h-4 w-1/4 rounded-full bg-paper-2 shadow-(--recess)" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        {Array.from({ length: 2 }, (_, i) => (
+          <div key={i} className="flex flex-col items-center gap-2">
+            <div className="aspect-square w-full max-w-xs rounded-2xl bg-paper-2 shadow-(--recess)" />
+            <div className="h-3 w-16 rounded-full bg-paper-2 shadow-(--recess)" />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="h-6 w-28 rounded-md bg-paper-2 shadow-(--recess)" />
+        <div className="flex flex-col gap-2.5">
+          <div className="h-4 w-full rounded-full bg-paper-2 shadow-(--recess)" />
+          <div className="h-4 w-full rounded-full bg-paper-2 shadow-(--recess)" />
+          <div className="h-4 w-4/5 rounded-full bg-paper-2 shadow-(--recess)" />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="h-6 w-36 rounded-md bg-paper-2 shadow-(--recess)" />
+        <div className="grid grid-cols-4 items-end gap-3 border-t border-hairline pt-4">
+          {[60, 85, 45, 70].map((height) => (
+            <div key={height} className="flex flex-col items-center gap-2">
+              <div className="flex h-36 w-full items-end justify-center">
+                <div
+                  className="w-full max-w-12 rounded-t-md bg-paper-2 shadow-(--recess)"
+                  style={{ height: `${height}%` }}
+                />
+              </div>
+              <div className="h-3 w-10 rounded-full bg-paper-2 shadow-(--recess)" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <div className="h-8 w-40 rounded-full bg-paper-2 shadow-(--recess)" />
+        <div className="h-8 w-32 rounded-full bg-paper-2 shadow-(--recess)" />
+      </div>
     </div>
   );
 }
