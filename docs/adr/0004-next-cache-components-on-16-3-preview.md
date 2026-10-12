@@ -1,5 +1,8 @@
 # Next Cache Components on 16.4; URL-driven Season
 
+Cache lifetime and invalidation decisions below are superseded by
+[ADR-0007](0007-long-lived-guide-and-illustration-caches.md).
+
 Adopt Next.js **16.4 canary** with `cacheComponents`, `partialPrefetching`, `reactCompiler`, and `typedRoutes` (`experimental.useOffline` on; no `inlineCss`). Workflow wrapper preserved. Public atlas detail uses `'use cache'` (`cacheLife('hours')`, tags `guide-species` / `species:{slug}`); the atlas list and collage cache the Convex fetch the same way (`guide-species`). Packing still covers every Season in one hourly entry; the page **sends that Season’s layout only**.
 
 **Season is URL-driven RSC.** Collage home and the Atlas list always carry explicit `?season=`. `src/proxy.ts` folds next-intl locale negotiation and Season canonicalize into one 307: missing or invalid `?season=` on `/` and `/atlas` (per Locale) becomes the current Season in `Asia/Tokyo`. All-year only when the URL says `all`. Species detail, about, audio, and admin are not canonicalized. Season pills are FastLink `replace` navigations with eager prefetch of all five hrefs — not a client layout swap.

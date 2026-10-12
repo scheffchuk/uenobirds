@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query } from "./_generated/server";
+import { mutation } from "./functions";
 import {
   audioSourceMetadataFields,
   speciesEbirdValidator,
@@ -86,7 +87,7 @@ export const listSyncState = query({
   },
 });
 
-/** Store generated media metadata and replace the old blob only after the patch succeeds. */
+/** Store generated media metadata; replaced public blobs are retained by the species trigger. */
 export const syncSpeciesMedia = mutation({
   args: {
     secret: v.string(),
@@ -104,7 +105,6 @@ export const syncSpeciesMedia = mutation({
       .unique();
     if (!species) throw new Error(`Species not found: ${args.slug}`);
 
-    const previousStorageId = species.audio?.storageId;
     const nextAudio = args.audio.status === "available"
       ? {
           ...args.audio,
@@ -115,31 +115,14 @@ export const syncSpeciesMedia = mutation({
           unavailableReason: args.audio.reason,
         };
 
-    const nextStorageId = args.audio.status === "available"
-      ? args.audio.storageId
-      : undefined;
-    const hasNewUpload =
-      nextStorageId !== undefined && previousStorageId !== nextStorageId;
-
-    try {
-      await ctx.db.patch(species._id, {
-        audio: nextAudio,
-        ...(args.ebird !== undefined ? { ebird: args.ebird ?? undefined } : {}),
-        ...(args.wikipedia !== undefined
-          ? { wikipedia: args.wikipedia ?? undefined }
-          : {}),
-      });
-
-      if (previousStorageId && previousStorageId !== nextStorageId) {
-        await ctx.storage.delete(previousStorageId);
-        return { deletedPreviousStorage: true };
-      }
-    } catch (error) {
-      if (hasNewUpload && nextStorageId) {
-        await ctx.storage.delete(nextStorageId);
-      }
-      throw error;
-    }
+    await ctx.db.patch(species._id, {
+      audio: nextAudio,
+      ...(args.ebird !== undefined ? { ebird: args.ebird ?? undefined } : {}),
+      ...(args.wikipedia !== undefined
+        ? { wikipedia: args.wikipedia ?? undefined }
+        : {}),
+    });
+    // The species trigger retains replaced media for cached public pages.
     return { deletedPreviousStorage: false };
   },
 });

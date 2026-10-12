@@ -5,11 +5,11 @@ import { GUIDE_SPECIES_TAG, speciesCacheTag } from "./cache-tags";
 
 /**
  * Cached Atlas detail payload for a Listed Guide species Slug.
- * Hourly TTL; busted via species:{slug} from illustration generate paths.
+ * Long-lived; invalidated by Convex public-content mutations.
  */
 export async function loadListedSpecies(slug: string) {
   "use cache";
-  cacheLife("hours");
+  cacheLife("max");
   cacheTag(GUIDE_SPECIES_TAG, speciesCacheTag(slug));
   return await fetchQuery(api.species.getSpecies, { slug });
 }

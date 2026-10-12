@@ -1,9 +1,16 @@
 import { convexAuthNextjsMiddleware } from "@convex-dev/auth/nextjs/server";
 import createMiddleware from "next-intl/middleware";
-import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import {
+  NextResponse,
+  type NextFetchEvent,
+  type NextRequest,
+} from "next/server";
 import { routing } from "./i18n/routing";
 import { seasonCanonicalLocation } from "./lib/season/canonicalize";
-import { requiresConvexAuthMiddleware } from "./lib/proxy/path-scope";
+import {
+  requiresConvexAuthMiddleware,
+  requiresI18nMiddleware,
+} from "./lib/proxy/path-scope";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -32,7 +39,7 @@ function applySeasonCanonical(
 
   if (location) {
     const next = NextResponse.redirect(canonical, {
-      status: i18nResponse.status === 308 ? 307 : (i18nResponse.status || 307),
+      status: i18nResponse.status === 308 ? 307 : i18nResponse.status || 307,
     });
     copyCookies(i18nResponse, next);
     return next;
@@ -49,6 +56,9 @@ export default async function proxy(
 ) {
   if (requiresConvexAuthMiddleware(request.nextUrl.pathname)) {
     return handleAuthRoutes(request, event);
+  }
+  if (!requiresI18nMiddleware(request.nextUrl.pathname)) {
+    return NextResponse.next();
   }
   const i18nResponse = await handleI18nRouting(request);
   return applySeasonCanonical(request, i18nResponse);

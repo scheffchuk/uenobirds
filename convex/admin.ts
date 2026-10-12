@@ -1,5 +1,6 @@
 import { v, Infer } from "convex/values";
-import { mutation, query, internalMutation } from "./_generated/server";
+import { query } from "./_generated/server";
+import { mutation, internalMutation } from "./functions";
 import type { MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./lib/auth";
@@ -19,7 +20,6 @@ import {
   type Season,
 } from "./lib/curation";
 import { SEASONS } from "./lib/seedPlan";
-import { deleteReplacedStorage } from "./lib/deleteReplacedStorage";
 
 const prevalenceValidator = v.object({
   winter: v.number(),
@@ -390,17 +390,6 @@ export const attachIllustrations = mutation({
       dimsPerch: args.dimsPerch,
       dimsFlight: args.dimsFlight,
     });
-
-    await deleteReplacedStorage(
-      ctx,
-      sp.illustrationPerch,
-      args.illustrationPerch,
-    );
-    await deleteReplacedStorage(
-      ctx,
-      sp.illustrationFlight,
-      args.illustrationFlight,
-    );
 
     await ctx.db.patch(args.speciesId, {
       illustrationPerch: args.illustrationPerch,

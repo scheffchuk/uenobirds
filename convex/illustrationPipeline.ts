@@ -1,11 +1,10 @@
 import { v } from "convex/values";
 import {
-  internalMutation,
   internalQuery,
-  mutation,
   query,
   type MutationCtx,
 } from "./_generated/server";
+import { mutation, internalMutation } from "./functions";
 import { requireAdmin } from "./lib/auth";
 import {
   planClearForGeneration,
@@ -298,7 +297,6 @@ export const stageIllustrationPose = mutation({
     });
 
     if (args.pose === "perch") {
-      await deleteReplacedStorage(ctx, sp.illustrationPerch, args.storageId);
       await ctx.db.patch(sp._id, {
         illustrationPerch: args.storageId,
         maskPerch: args.mask,
@@ -306,7 +304,6 @@ export const stageIllustrationPose = mutation({
         illustrationStatus: patch.illustrationStatus,
       });
     } else {
-      await deleteReplacedStorage(ctx, sp.illustrationFlight, args.storageId);
       await ctx.db.patch(sp._id, {
         illustrationFlight: args.storageId,
         maskFlight: args.mask,

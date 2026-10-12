@@ -7,12 +7,12 @@ import type { CollageLayouts } from "@/lib/collage/types";
 
 /**
  * Cached collage layouts for Listed Guide species with approved art.
- * Hourly TTL; busted via `guide-species` from illustration generate paths.
+ * Long-lived; invalidated by Convex public-content mutations.
  * Packing still covers every Season; the page sends one layout on the wire.
  */
 export async function loadForCollage(): Promise<CollageLayouts> {
   "use cache";
-  cacheLife("hours");
+  cacheLife("max");
   cacheTag(GUIDE_SPECIES_TAG);
   const species = await fetchQuery(api.species.listForCollage);
   return buildCollageLayouts(species);

@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     useOffline: true,
   },
   images: {
+    // Illustration replacements receive new Convex Storage URLs.
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: "https",

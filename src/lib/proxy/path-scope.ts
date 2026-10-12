@@ -11,6 +11,8 @@ export function classifyProxyPath(pathname: string): ProxyPathScope {
 }
 
 export function requiresConvexAuthMiddleware(pathname: string): boolean {
+  // This service webhook authenticates the pipeline secret in its handler.
+  if (pathname === "/api/guide/revalidate") return false;
   const scope = classifyProxyPath(pathname);
   return scope === "admin" || scope === "api";
 }

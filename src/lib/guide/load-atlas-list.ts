@@ -5,12 +5,12 @@ import { GUIDE_SPECIES_TAG } from "./cache-tags";
 
 /**
  * Cached Atlas list payload for Listed Guide species.
- * Hourly TTL; busted via `guide-species` from illustration generate paths.
+ * Long-lived; invalidated by Convex public-content mutations.
  * Season is chosen on the server from `?season=` after proxy canonicalize.
  */
 export async function loadAtlasList() {
   "use cache";
-  cacheLife("hours");
+  cacheLife("max");
   cacheTag(GUIDE_SPECIES_TAG);
   return await fetchQuery(api.species.listAtlas);
 }

@@ -34,6 +34,11 @@ describe("classifyProxyPath", () => {
 });
 
 describe("requiresConvexAuthMiddleware", () => {
+  it("lets the guide webhook authenticate its own service secret", () => {
+    expect(requiresConvexAuthMiddleware("/api/guide/revalidate")).toBe(false);
+    expect(requiresI18nMiddleware("/api/guide/revalidate")).toBe(false);
+    expect(requiresConvexAuthMiddleware("/api/guide/revalidate/other")).toBe(true);
+  });
   it("runs auth middleware for admin and api only", () => {
     expect(requiresConvexAuthMiddleware("/admin")).toBe(true);
     expect(requiresConvexAuthMiddleware("/api/illustrations/generate")).toBe(

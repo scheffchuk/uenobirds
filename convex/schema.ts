@@ -10,6 +10,12 @@ import {
 export default defineSchema({
   ...authTables,
 
+  /** Public media still referenced by cached guide pages. */
+  retiredStorage: defineTable({
+    storageId: v.id("_storage"),
+    retiredAt: v.number(),
+  }).index("by_storageId", ["storageId"]),
+
   species: defineTable({
     sciName: v.string(),
     comNameEn: v.string(),

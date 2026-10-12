@@ -11,6 +11,8 @@
 import type * as admin from "../admin.js";
 import type * as audio from "../audio.js";
 import type * as auth from "../auth.js";
+import type * as functions from "../functions.js";
+import type * as guideCache from "../guideCache.js";
 import type * as http from "../http.js";
 import type * as illustrationAnatomy from "../illustrationAnatomy.js";
 import type * as illustrationPipeline from "../illustrationPipeline.js";
@@ -28,6 +30,7 @@ import type * as lib_illustrationCustomId from "../lib/illustrationCustomId.js";
 import type * as lib_illustrationPrompt from "../lib/illustrationPrompt.js";
 import type * as lib_loadSpecies from "../lib/loadSpecies.js";
 import type * as lib_maskBits from "../lib/maskBits.js";
+import type * as lib_retireReplacedStorage from "../lib/retireReplacedStorage.js";
 import type * as lib_seedPlan from "../lib/seedPlan.js";
 import type * as lib_selectForGeneration from "../lib/selectForGeneration.js";
 import type * as lib_slug from "../lib/slug.js";
@@ -44,6 +47,8 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   audio: typeof audio;
   auth: typeof auth;
+  functions: typeof functions;
+  guideCache: typeof guideCache;
   http: typeof http;
   illustrationAnatomy: typeof illustrationAnatomy;
   illustrationPipeline: typeof illustrationPipeline;
@@ -61,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   "lib/illustrationPrompt": typeof lib_illustrationPrompt;
   "lib/loadSpecies": typeof lib_loadSpecies;
   "lib/maskBits": typeof lib_maskBits;
+  "lib/retireReplacedStorage": typeof lib_retireReplacedStorage;
   "lib/seedPlan": typeof lib_seedPlan;
   "lib/selectForGeneration": typeof lib_selectForGeneration;
   "lib/slug": typeof lib_slug;

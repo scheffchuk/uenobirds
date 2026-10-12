@@ -2,10 +2,11 @@ import { Infer, v } from "convex/values";
 import {
   action,
   internalAction,
-  internalMutation,
   internalQuery,
   type QueryCtx,
 } from "./_generated/server";
+import { internalMutation } from "./functions";
+import { PUBLIC_STORAGE_RETENTION_MS } from "./lib/retireReplacedStorage";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 
@@ -47,6 +48,7 @@ async function collectReferencedStorageIds(
     if (sp.illustrationFlight) referenced.add(sp.illustrationFlight);
     if (sp.anatomyRef) referenced.add(sp.anatomyRef);
     if (sp.anatomyRefFlight) referenced.add(sp.anatomyRefFlight);
+    if (sp.audio?.storageId) referenced.add(sp.audio.storageId);
   }
   // The style-print table is intentionally inventoried in full for garbage collection.
   const stylePrints = await ctx.db.query("stylePrints").collect();
@@ -57,9 +59,9 @@ async function collectReferencedStorageIds(
 }
 
 export const listOrphanStorage = internalQuery({
-  args: {},
+  args: { now: v.number() },
   returns: orphanReportValidator,
-  handler: async (ctx): Promise<OrphanReport> => {
+  handler: async (ctx, args): Promise<OrphanReport> => {
     // Storage is intentionally inventoried in full for garbage collection.
     const files = await ctx.db.system.query("_storage").collect();
     const referenced = await collectReferencedStorageIds(ctx);
@@ -71,7 +73,14 @@ export const listOrphanStorage = internalQuery({
 
     for (const file of files) {
       totalBytes += file.size;
-      if (referenced.has(file._id)) {
+      const retired = await ctx.db
+        .query("retiredStorage")
+        .withIndex("by_storageId", (q) => q.eq("storageId", file._id))
+        .unique();
+      const retained =
+        retired !== null &&
+        args.now < retired.retiredAt + PUBLIC_STORAGE_RETENTION_MS;
+      if (referenced.has(file._id) || retained) {
         referencedBytes += file.size;
       } else {
         orphanIds.push(file._id);
@@ -98,8 +107,20 @@ export const deleteOrphanStorageBatch = internalMutation({
   returns: v.number(),
   handler: async (ctx, args) => {
     let deleted = 0;
+    const referenced = await collectReferencedStorageIds(ctx);
     for (const id of args.ids) {
+      if (referenced.has(id)) continue;
+      const retired = await ctx.db
+        .query("retiredStorage")
+        .withIndex("by_storageId", (q) => q.eq("storageId", id))
+        .unique();
+      if (
+        retired &&
+        Date.now() < retired.retiredAt + PUBLIC_STORAGE_RETENTION_MS
+      )
+        continue;
       await ctx.storage.delete(id);
+      if (retired) await ctx.db.delete(retired._id);
       deleted += 1;
     }
     return deleted;
@@ -110,7 +131,7 @@ async function runGc(
   ctx: {
     runQuery: (
       ref: typeof internal.storageGc.listOrphanStorage,
-      args: Record<string, never>,
+      args: { now: number },
     ) => Promise<OrphanReport>;
     runMutation: (
       ref: typeof internal.storageGc.deleteOrphanStorageBatch,
@@ -119,7 +140,9 @@ async function runGc(
   },
   args: { dryRun: boolean; batchSize?: number },
 ): Promise<GcResult> {
-  const report = await ctx.runQuery(internal.storageGc.listOrphanStorage, {});
+  const report = await ctx.runQuery(internal.storageGc.listOrphanStorage, {
+    now: Date.now(),
+  });
 
   if (args.dryRun) {
     return {
@@ -146,7 +169,9 @@ async function runGc(
     );
   }
 
-  const after = await ctx.runQuery(internal.storageGc.listOrphanStorage, {});
+  const after = await ctx.runQuery(internal.storageGc.listOrphanStorage, {
+    now: Date.now(),
+  });
 
   return {
     dryRun: false,
