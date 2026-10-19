@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { BookOpenIcon } from "lucide-react";
 import { CollageView } from "./CollageView";
 import { SeasonLink } from "@/components/season/SeasonLink";
+import { SeasonPickerSkeleton } from "@/components/season/SeasonPickerSkeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { FastLink } from "@/components/ui/fast-link";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
@@ -67,7 +68,7 @@ function HomeChromeFallback() {
         aria-hidden
       />
       <header className="fixed inset-x-0 top-0 z-20 flex flex-col items-center px-4 pt-16 pb-4 text-center md:pt-20">
-        <div className="h-9 w-56" aria-hidden />
+        <div className="h-[clamp(22px,2.8vw,34px)] w-56" aria-hidden />
       </header>
       <div className="h-28 shrink-0 md:h-32" aria-hidden />
     </>
@@ -77,10 +78,7 @@ function HomeChromeFallback() {
 function CollageSkeleton() {
   return (
     <>
-      <div
-        className="fixed top-4 left-4 z-30 h-8 w-52 max-w-[calc(100vw-8rem)] rounded-full bg-paper-2 shadow-(--recess) md:top-5 md:left-7"
-        aria-hidden
-      />
+      <SeasonPickerSkeleton className="fixed top-4 left-4 z-30 md:top-5 md:left-7" />
       <div className="absolute inset-0" aria-hidden />
     </>
   );

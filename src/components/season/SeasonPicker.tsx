@@ -10,6 +10,11 @@ import {
   type SeasonPickerPath,
 } from "@/lib/season/url";
 import { cn } from "@/lib/utils";
+import {
+  SeasonPickerLabel,
+  seasonPickerItem,
+  seasonPickerTrack,
+} from "./season-picker-layout";
 
 /** Season pills as FastLink navigations — prefetch all five. */
 export function SeasonPicker({
@@ -57,7 +62,7 @@ export function SeasonPicker({
       aria-label={t("ariaLabel")}
       data-filtering={pending || undefined}
       className={cn(
-        "relative inline-flex h-8 items-center rounded-full bg-paper-2 p-1 shadow-(--recess)",
+        seasonPickerTrack,
         className,
       )}
     >
@@ -79,17 +84,12 @@ export function SeasonPicker({
             data-pressed={active ? "" : undefined}
             onPressNavigate={() => setPendingFor(id)}
             className={cn(
-              "relative z-10 inline-flex h-full min-h-0 min-w-0 items-center justify-center rounded-full px-3 font-mono text-[10px] leading-none text-ink-soft uppercase",
+              seasonPickerItem,
               "hover:text-ink",
               active && "text-ink",
             )}
           >
-            <span className="hidden tracking-[0.14em] pl-[0.14em] sm:inline">
-              {t(id)}
-            </span>
-            <span className="tracking-[0.14em] pl-[0.14em] sm:hidden">
-              {t(`short.${id}`)}
-            </span>
+            <SeasonPickerLabel full={t(id)} short={t(`short.${id}`)} />
           </FastLink>
         );
       })}
