@@ -45,3 +45,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## UI checks
+
+Use agent-browser for UI checks (npm i -g agent-browser && agent-browser install). Before first use, run `agent-browser skills get core` and follow it. Before declaring a UI change done, open the dev server, snapshot, click through the changed flow, and check console errors.
