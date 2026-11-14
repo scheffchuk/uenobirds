@@ -48,4 +48,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## UI checks
 
-Use agent-browser for UI checks (npm i -g agent-browser && agent-browser install). Before first use, run `agent-browser skills get core` and follow it. Before declaring a UI change done, open the dev server, snapshot, click through the changed flow, and check console errors.
+Use agent-browser for UI checks (pnpm add -g agent-browser && agent-browser install). Before first use, run `agent-browser skills get core` and follow it. Before declaring a UI change done, open the dev server, snapshot, click through the changed flow, and check console errors.
