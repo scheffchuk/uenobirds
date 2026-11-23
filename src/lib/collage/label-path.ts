@@ -28,8 +28,9 @@ const MIN_LANDSCAPE_AREA_FRAC = 0.006;
 const MIN_PORTRAIT_AREA_FRAC = 0.007;
 const MIN_RELATIVE_AREA_FRAC = 0.6;
 const MIN_TILE_WIDTH_PX = 56;
-const MAX_LABELS_LANDSCAPE = 16;
+const MAX_LABELS_LANDSCAPE = 14;
 const MAX_LABELS_PORTRAIT = 10;
+const MIN_PATH_SPAN_VB = 170;
 
 function round1(n: number): number {
   return Math.round(n * 10) / 10;
@@ -136,15 +137,33 @@ export function buildSilhouetteLabelPath(
         ? smoothBot.map((y) => y + margin + fontSize * 0.6)
         : smoothTop.map((y) => y - margin);
 
-      // Extend slightly past both ends along the local tangent so long names breathe.
-      const dx0 = xs[1]! - xs[0]!;
-      const dy0 = rawYs[1]! - rawYs[0]!;
-      const dx1 = xs[samples - 1]! - xs[samples - 2]!;
-      const dy1 = rawYs[samples - 1]! - rawYs[samples - 2]!;
+      // Extend past both ends so long species names never clip at SVG textPath endpoints.
+      const xFirst = xs[0]!;
+      const xLast = xs[samples - 1]!;
+      const yFirst = rawYs[0]!;
+      const yLast = rawYs[samples - 1]!;
+      const midSpanX = (xFirst + xLast) / 2;
+      const halfTarget = Math.max((xLast - xFirst) / 2 + 12, MIN_PATH_SPAN_VB / 2);
+      const extLeftX = midSpanX - halfTarget;
+      const extRightX = midSpanX + halfTarget;
+      const slopeLeft =
+        xs[1]! !== xFirst
+          ? Math.max(-0.25, Math.min(0.25, (rawYs[1]! - yFirst) / (xs[1]! - xFirst)))
+          : 0;
+      const slopeRight =
+        xLast !== xs[samples - 2]!
+          ? Math.max(
+              -0.25,
+              Math.min(
+                0.25,
+                (yLast - rawYs[samples - 2]!) / (xLast - xs[samples - 2]!),
+              ),
+            )
+          : 0;
       const pts: [number, number][] = [
-        [xs[0]! - dx0 * 0.35, rawYs[0]! - dy0 * 0.35],
+        [extLeftX, yFirst + slopeLeft * (extLeftX - xFirst)],
         ...xs.map((x, idx): [number, number] => [x, rawYs[idx]!]),
-        [xs[samples - 1]! + dx1 * 0.35, rawYs[samples - 1]! + dy1 * 0.35],
+        [extRightX, yLast + slopeRight * (extRightX - xLast)],
       ];
 
       // Build a smooth quadratic spline left-to-right.
@@ -173,14 +192,15 @@ export function buildSilhouetteLabelPath(
     }
   }
 
-  // Fallback gentle arc above (or below if hugging top edge) the tile bounding box.
+  // Fallback gentle arc with generous horizontal runway so long names never clip.
   const useBottom = tile.y < Math.max(18, tile.height * 0.08);
   const yEdge = useBottom ? vbH + margin + fontSize * 0.45 : -margin;
-  const arch = useBottom ? 4 : -4;
+  const arch = useBottom ? 5 : -5;
+  const halfRunway = MIN_PATH_SPAN_VB / 2;
   return {
     vbW,
     vbH,
-    d: `M 6 ${round1(yEdge)} Q 50 ${round1(yEdge + arch)} 94 ${round1(yEdge)}`,
+    d: `M ${round1(50 - halfRunway)} ${round1(yEdge)} Q 50 ${round1(yEdge + arch)} ${round1(50 + halfRunway)} ${round1(yEdge)}`,
     fontSize,
     ink,
   };
@@ -188,7 +208,7 @@ export function buildSilhouetteLabelPath(
 
 /**
  * Select which tiles receive curved silhouette labels and compute their paths.
- * Caps label density on crowded canvases so prominent birds remain crisp and legible.
+ * Caps label density and enforces minimum anchor spacing so labels stay crisp.
  */
 export function buildLabelsForCanvas(
   tiles: readonly LabelCandidateInput[],
@@ -201,6 +221,8 @@ export function buildLabelsForCanvas(
   const maxLabels =
     mode === "landscape" ? MAX_LABELS_LANDSCAPE : MAX_LABELS_PORTRAIT;
   const canvasArea = Math.max(1, canvasW * canvasH);
+  const minDx = mode === "landscape" ? 88 : 78;
+  const minDy = mode === "landscape" ? 24 : 22;
 
   const scored = tiles.map((tile) => ({
     tile,
@@ -215,7 +237,7 @@ export function buildLabelsForCanvas(
     maxAreaFrac * MIN_RELATIVE_AREA_FRAC,
   );
 
-  const ranked = scored
+  const candidates = scored
     .filter(
       ({ tile, areaFrac }) =>
         areaFrac >= effectiveMinArea && tile.width >= MIN_TILE_WIDTH_PX,
@@ -223,13 +245,24 @@ export function buildLabelsForCanvas(
     .sort(
       (a, b) =>
         b.areaFrac - a.areaFrac || a.tile.slug.localeCompare(b.tile.slug),
-    )
-    .slice(0, maxLabels);
+    );
 
+  const placedAnchors: { x: number; y: number }[] = [];
   const out = new Map<string, CollageLabelPath>();
-  for (const { tile } of ranked) {
+  for (const { tile } of candidates) {
+    if (out.size >= maxLabels) break;
+    const useBottom = tile.y < Math.max(18, tile.height * 0.08);
+    const anchorX = tile.x + tile.width / 2;
+    const anchorY = useBottom ? tile.y + tile.height + 6 : tile.y - 6;
+    const collides = placedAnchors.some(
+      (pt) => Math.abs(pt.x - anchorX) < minDx && Math.abs(pt.y - anchorY) < minDy,
+    );
+    if (collides) continue;
     const label = buildSilhouetteLabelPath(tile, canvasW, canvasH);
-    if (label) out.set(tile.slug, label);
+    if (label) {
+      out.set(tile.slug, label);
+      placedAnchors.push({ x: anchorX, y: anchorY });
+    }
   }
   return out;
 }

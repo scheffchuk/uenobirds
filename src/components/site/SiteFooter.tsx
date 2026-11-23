@@ -8,7 +8,7 @@ export async function SiteFooter({ locale }: { locale: AppLocale }) {
   const t = messages.Footer;
 
   return (
-    <footer className="mt-auto px-6 py-6 md:px-10">
+    <footer className="mt-auto px-6 pt-4 pb-20 md:px-10 md:pt-3 md:pb-22">
       <div className="mx-auto max-w-3xl text-center">
         <p className="font-mono text-[10px] tracking-[0.18em] text-ink-soft uppercase">
           {t.credit}{" "}
@@ -53,5 +53,7 @@ export async function SiteFooter({ locale }: { locale: AppLocale }) {
 }
 
 export function SiteFooterFallback() {
-  return <footer className="mt-auto px-6 py-6 md:px-10" aria-hidden />;
+  return (
+    <footer className="mt-auto px-6 pt-4 pb-20 md:px-10 md:pt-3 md:pb-22" aria-hidden />
+  );
 }

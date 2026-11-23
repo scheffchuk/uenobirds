@@ -104,7 +104,7 @@ export default function HomePage({
         <HomeChrome />
       </AnimatedSuspense>
 
-      <div className="relative mx-auto flex min-h-[50vh] w-full max-w-325 flex-1 flex-col px-4 pb-16 md:px-8 md:pb-20">
+      <div className="relative mx-auto flex min-h-[50vh] w-full max-w-325 flex-1 flex-col px-4 pb-2 md:px-8 md:pb-3">
         <AnimatedSuspense fallback={<CollageSkeleton />}>
           <CollageSection searchParams={searchParams} />
         </AnimatedSuspense>

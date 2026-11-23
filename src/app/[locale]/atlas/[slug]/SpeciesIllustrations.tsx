@@ -108,10 +108,10 @@ export function SpeciesIllustrations({
     <section
       aria-label={t("illustrations")}
       className={cn(
-        "postcard-visual-panel relative flex w-full flex-col items-center justify-center overflow-hidden",
+        "postcard-visual-panel relative flex w-full flex-col items-center justify-center overflow-hidden lg:h-full",
         compact
-          ? "min-h-60 px-6 pt-6 pb-14 sm:min-h-72 lg:min-h-112"
-          : "min-h-76 px-6 pt-8 pb-16 sm:min-h-96 lg:min-h-128",
+          ? "min-h-60 px-6 pt-6 pb-14 sm:min-h-72 lg:min-h-0"
+          : "min-h-76 px-6 pt-8 pb-16 sm:min-h-96 lg:min-h-0",
       )}
     >
       <div

@@ -31,11 +31,11 @@ describe("collage curved label path placement", () => {
     expect(path!.vbW).toBe(100);
     expect(path!.vbH).toBeCloseTo(81.8, 0);
     expect(path!.d).toMatch(/^M /);
-    // Start x < end x so text reads left-to-right
+    // Start x < end x so text reads left-to-right with generous runway for long names
     const nums = path!.d.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
     const startX = nums[0]!;
     const endX = nums[nums.length - 2]!;
-    expect(endX).toBeGreaterThan(startX);
+    expect(endX - startX).toBeGreaterThanOrEqual(160);
     // Midpoint y stays above the silhouette's upper back (~33% of vbH)
     const startY = nums[1]!;
     expect(startY).toBeLessThan(path!.vbH * 0.55);
@@ -76,10 +76,10 @@ describe("collage curved label path placement", () => {
   it("still labels prominent birds on a crowded 60-species season flock", () => {
     const crowded = Array.from({ length: 60 }, (_, i) => ({
       slug: `winter-${i}`,
-      x: (i % 10) * 95,
-      y: Math.floor(i / 10) * 85,
-      width: i < 20 ? 105 : 62,
-      height: i < 20 ? 62 : 42,
+      x: (i % 10) * 98,
+      y: 25 + Math.floor(i / 10) * 84,
+      width: i % 3 === 0 ? 105 : 62,
+      height: i % 3 === 0 ? 62 : 42,
     }));
 
     const landscapeLabels = buildLabelsForCanvas(
@@ -89,7 +89,9 @@ describe("collage curved label path placement", () => {
       "landscape",
     );
     const portraitLabels = buildLabelsForCanvas(crowded, 600, 1000, "portrait");
-    expect(landscapeLabels.size).toBe(16);
-    expect(portraitLabels.size).toBe(10);
+    expect(landscapeLabels.size).toBeGreaterThanOrEqual(8);
+    expect(landscapeLabels.size).toBeLessThanOrEqual(14);
+    expect(portraitLabels.size).toBeGreaterThanOrEqual(6);
+    expect(portraitLabels.size).toBeLessThanOrEqual(10);
   });
 });

@@ -48,13 +48,20 @@ export async function AtlasDetailView({
         className={cn(
           "postcard-sheet grid grid-cols-1 gap-2 p-2",
           hasArt
-            ? "lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:items-stretch"
+            ? "lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:items-start"
             : "mx-auto w-full max-w-2xl",
           inModal && "postcard-sheet-modal",
         )}
       >
         {hasArt ? (
-          <div className="flex min-w-0 lg:sticky lg:top-8 lg:self-stretch">
+          <div
+            className={cn(
+              "flex min-w-0 lg:sticky lg:self-start",
+              inModal
+                ? "lg:top-2 lg:h-[min(calc(88dvh-16px),660px)]"
+                : "lg:top-6 lg:h-[min(calc(100dvh-6rem),640px)]",
+            )}
+          >
             <SpeciesIllustrations
               key={species.slug}
               species={{
