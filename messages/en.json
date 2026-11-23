@@ -31,7 +31,13 @@
     "audioUnavailable": "Audio unavailable",
     "wikipedia": "Wikipedia",
     "ebird": "eBird",
-    "opensNewTab": "opens in a new tab"
+    "opensNewTab": "opens in a new tab",
+    "searchLabel": "Search birds by name in any language",
+    "searchPlaceholder": "Search birds by name…",
+    "results": "{count, plural, one {# bird} other {# birds}}",
+    "noResultsTitle": "No matching birds",
+    "noResultsDescription": "Try an English, Japanese, Chinese, or scientific name.",
+    "clearSearch": "Clear search"
   },
   "AtlasDetail": {
     "about": "About",
@@ -50,7 +56,8 @@
     "ariaLabel": "Seasonal collage of birds in Ueno",
     "emptyTitle": "No illustrations for this season yet",
     "emptyDescription": "Check back soon, or explore the full list in the Atlas.",
-    "browseAtlas": "Browse the Atlas"
+    "browseAtlas": "Browse the Atlas",
+    "hint": "Choose a bird to explore. Larger birds are seen more often."
   },
   "Season": {
     "winter": "Winter",

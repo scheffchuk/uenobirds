@@ -31,7 +31,13 @@
     "audioUnavailable": "鳴き声の録音なし",
     "wikipedia": "Wikipedia",
     "ebird": "eBird",
-    "opensNewTab": "新しいタブで開きます"
+    "opensNewTab": "新しいタブで開きます",
+    "searchLabel": "各言語の名前で鳥を検索",
+    "searchPlaceholder": "鳥の名前で検索…",
+    "results": "{count} 種",
+    "noResultsTitle": "該当する鳥が見つかりません",
+    "noResultsDescription": "日本語・英語・中国語の名前、または学名で検索してみてください。",
+    "clearSearch": "検索をクリア"
   },
   "AtlasDetail": {
     "about": "どんな鳥？",
@@ -50,7 +56,8 @@
     "ariaLabel": "上野の鳥たちのコラージュ",
     "emptyTitle": "この季節のイラストはまだ準備中です",
     "emptyDescription": "公開までしばらくお待ちいただくか、図鑑からご覧ください。",
-    "browseAtlas": "図鑑を見る"
+    "browseAtlas": "図鑑を見る",
+    "hint": "鳥を選ぶと詳しく見られます。よく出会う鳥ほど大きく表示しています。"
   },
   "Season": {
     "winter": "冬",

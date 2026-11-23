@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AtlasListView } from "./AtlasListView";
-import { LocaleChromeBar, LocaleChromeBarFallback } from "@/components/site/LocaleChromeBar";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { SeasonPickerSkeleton } from "@/components/season/SeasonPickerSkeleton";
 import { loadMessages } from "@/i18n/load-messages";
 import type { AppLocale } from "@/i18n/routing";
 import { loadAtlasList } from "@/lib/guide/load-atlas-list";
-import { requireSeasonParam, type SeasonSearch } from "@/lib/season/require-param";
+import {
+  requireSeasonParam,
+  type SeasonSearch,
+} from "@/lib/season/require-param";
 
 export async function generateMetadata({
   searchParams,
@@ -43,29 +43,17 @@ async function AtlasChrome() {
   const copy = await atlasChromeCopy(locale);
 
   return (
-    <header className="flex flex-col gap-5">
-      <LocaleChromeBar
-        leading={
-          <SeasonLink pathname="/" backLabel={copy.backToCollage} prefetch={true} />
-        }
-        trailing={null}
-      />
-      <div className="flex flex-col gap-1 text-center">
-        <h1 className="font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
-          {copy.title}
-        </h1>
-      </div>
+    <header className="grid grid-cols-[2rem_1fr_2rem] items-center gap-3">
+      <SeasonLink pathname="/" backLabel={copy.backToCollage} prefetch={true} />
+      <h1 className="text-center font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
+        {copy.title}
+      </h1>
     </header>
   );
 }
 
 function AtlasChromeFallback() {
-  return (
-    <header className="flex flex-col gap-5">
-      <LocaleChromeBarFallback showTrailing={false} />
-      <div className="h-[clamp(22px,2.8vw,34px)]" aria-hidden />
-    </header>
-  );
+  return <div className="h-8" aria-hidden />;
 }
 
 async function AtlasListSection({
@@ -81,36 +69,23 @@ async function AtlasListSection({
 
 function AtlasListSkeleton() {
   return (
-    <div className="flex flex-col gap-8" aria-hidden>
+    <div className="flex flex-col gap-4" aria-hidden>
       <div className="mx-auto h-5 w-48" />
       <div className="flex justify-center">
         <SeasonPickerSkeleton />
       </div>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+      <div className="h-10 max-w-sm rounded-lg bg-paper-2" />
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => (
-          <li key={i}>
-            <Card size="sm" className="h-full ring-0 shadow-(--raised)">
-              <div>
-                <div className="px-(--card-spacing) pt-(--card-spacing)">
-                  <div className="aspect-square w-full rounded-xl bg-paper-2 shadow-(--recess)" />
-                </div>
-                <CardHeader className="gap-0.5">
-                  <CardTitle className="text-sm leading-snug">
-                    <div className="h-[1lh] w-2/3 rounded-md bg-paper-2" />
-                  </CardTitle>
-                </CardHeader>
-              </div>
-              <div className="-mt-2 px-(--card-spacing)">
-                <CardDescription className="text-xs">
-                  <div className="h-[1lh] w-1/2 rounded-md bg-paper-2" />
-                </CardDescription>
-              </div>
-              <Separator className="mx-auto w-[90%] self-center bg-hairline opacity-50 data-horizontal:w-[90%]" />
-              <div className="flex items-center justify-between px-3 py-2">
-                <div className="size-7 rounded-lg bg-paper-2" />
-                <div className="h-7 w-20 rounded-lg bg-paper-2" />
-              </div>
-            </Card>
+          <li
+            key={i}
+            className="flex h-26 items-center gap-3 rounded-xl p-3 shadow-(--raised) sm:h-80 sm:flex-col"
+          >
+            <div className="size-20 shrink-0 rounded-lg bg-paper-2 sm:size-48" />
+            <div className="flex flex-1 flex-col gap-2">
+              <div className="h-4 w-32 rounded-md bg-paper-2" />
+              <div className="h-3 w-24 rounded-md bg-paper-2" />
+            </div>
           </li>
         ))}
       </ul>
@@ -124,7 +99,7 @@ export default function AtlasPage({
   searchParams: Promise<SeasonSearch>;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-6 py-10 md:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-4 pt-4 pb-10 sm:px-6 md:px-8 md:pt-5">
       <AnimatedSuspense fallback={<AtlasChromeFallback />}>
         <AtlasChrome />
       </AnimatedSuspense>

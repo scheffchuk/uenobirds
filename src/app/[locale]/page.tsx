@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { BookOpenIcon } from "lucide-react";
 import { CollageView } from "./CollageView";
 import { SeasonLink } from "@/components/season/SeasonLink";
+import { SeasonFilterControl } from "@/components/season/SeasonFilterControl";
 import { SeasonPickerSkeleton } from "@/components/season/SeasonPickerSkeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { FastLink } from "@/components/ui/fast-link";
@@ -11,7 +12,10 @@ import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { loadMessages } from "@/i18n/load-messages";
 import type { AppLocale } from "@/i18n/routing";
 import { loadForCollage } from "@/lib/collage/load-for-collage";
-import { requireSeasonParam, type SeasonSearch } from "@/lib/season/require-param";
+import {
+  requireSeasonParam,
+  type SeasonSearch,
+} from "@/lib/season/require-param";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,6 +30,7 @@ async function homeChromeCopy(locale: AppLocale) {
   return {
     title: messages.Home.title,
     atlas: messages.Nav.atlas,
+    hint: messages.Collage.hint,
   };
 }
 
@@ -40,22 +45,28 @@ async function HomeChrome() {
         prefetch={true}
         aria-label={copy.atlas}
         className={cn(
-          buttonVariants({ variant: "outline", size: "icon" }),
-          "fixed top-4 right-14 z-40 size-8 rounded-lg border-0 bg-paper-2 text-ink-soft shadow-(--recess)",
-          "hover:bg-paper-2 hover:text-ink md:top-5 md:right-16",
+          buttonVariants({ variant: "outline" }),
+          "absolute top-4 left-4 z-30 rounded-lg border-0 bg-paper-2 text-ink-soft shadow-(--recess)",
+          "hover:bg-paper-2 hover:text-ink md:top-5 md:left-7",
         )}
       >
-        <BookOpenIcon />
+        <BookOpenIcon data-icon="inline-start" />
+        {copy.atlas}
       </SeasonLink>
 
-      <header className="fixed inset-x-0 top-0 z-20 flex flex-col items-center px-4 pt-16 pb-4 text-center md:pt-20">
+      <header className="flex flex-col items-center gap-2 px-4 pt-16 pb-4 text-center md:pt-16">
         <h1 className="font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
-          <FastLink href="/about" className="transition-colors hover:text-ink-2">
+          <FastLink
+            href="/about"
+            className="transition-colors hover:text-ink-2"
+          >
             {copy.title}
           </FastLink>
         </h1>
+        <p className="max-w-80 text-xs leading-relaxed text-ink-soft sm:max-w-none">
+          {copy.hint}
+        </p>
       </header>
-      <div className="h-28 shrink-0 md:h-32" aria-hidden />
     </>
   );
 }
@@ -64,23 +75,25 @@ function HomeChromeFallback() {
   return (
     <>
       <div
-        className="fixed top-4 right-14 z-40 size-8 rounded-lg bg-paper-2 shadow-(--recess) md:top-5 md:right-16"
+        className="absolute top-4 left-4 z-30 h-8 w-20 rounded-lg bg-paper-2 shadow-(--recess) md:top-5 md:left-7"
         aria-hidden
       />
-      <header className="fixed inset-x-0 top-0 z-20 flex flex-col items-center px-4 pt-16 pb-4 text-center md:pt-20">
+      <header className="flex flex-col items-center gap-2 px-4 pt-16 pb-4 text-center md:pt-16">
         <div className="h-[clamp(22px,2.8vw,34px)] w-56" aria-hidden />
+        <div className="h-9 w-70 sm:h-4" aria-hidden />
       </header>
-      <div className="h-28 shrink-0 md:h-32" aria-hidden />
     </>
   );
 }
 
 function CollageSkeleton() {
   return (
-    <>
-      <SeasonPickerSkeleton className="fixed top-4 left-4 z-30 md:top-5 md:left-7" />
-      <div className="absolute inset-0" aria-hidden />
-    </>
+    <div className="flex flex-1 flex-col gap-4" aria-hidden>
+      <div className="flex justify-center">
+        <SeasonPickerSkeleton />
+      </div>
+      <div className="min-h-80 flex-1" />
+    </div>
   );
 }
 
@@ -95,11 +108,18 @@ async function CollageSection({
   const tiles = layouts.seasons[season].tiles;
   const present = new Set(tiles.map((tile) => tile.slug));
   return (
-    <CollageView
-      art={layouts.art.filter((item) => present.has(item.slug))}
-      tiles={tiles}
-      season={season}
-    />
+    <div className="group flex flex-1 flex-col gap-4">
+      <div className="flex justify-center">
+        <SeasonFilterControl season={season} pathname="/" />
+      </div>
+      <div className="relative min-h-80 flex-1">
+        <CollageView
+          art={layouts.art.filter((item) => present.has(item.slug))}
+          tiles={tiles}
+          season={season}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -114,7 +134,7 @@ export default function HomePage({
         <HomeChrome />
       </AnimatedSuspense>
 
-      <div className="relative mx-auto min-h-[60vh] w-full max-w-325 flex-1 px-2 md:px-8">
+      <div className="relative mx-auto flex min-h-[50vh] w-full max-w-325 flex-1 flex-col px-4 pb-3 md:px-8">
         <AnimatedSuspense fallback={<CollageSkeleton />}>
           <CollageSection searchParams={searchParams} />
         </AnimatedSuspense>

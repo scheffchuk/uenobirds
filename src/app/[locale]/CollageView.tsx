@@ -14,7 +14,6 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { SeasonFilterControl } from "@/components/season/SeasonFilterControl";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { SpeciesArtTransition } from "@/components/site/species-art-transition";
@@ -50,12 +49,6 @@ export function CollageView({
 
   return (
     <div className="group collage-frame" onMouseLeave={() => setHovered(null)}>
-      <SeasonFilterControl
-        season={season}
-        pathname="/"
-        className="fixed top-4 left-4 z-30 md:top-5 md:left-7"
-      />
-
       {tiles.length === 0 ? (
         <Empty className="absolute inset-0 border-0">
           <EmptyHeader>

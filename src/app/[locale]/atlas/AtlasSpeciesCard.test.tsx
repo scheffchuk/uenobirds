@@ -11,10 +11,17 @@ vi.mock("@/i18n/navigation", () => ({
     children,
     ...props
   }: {
-    href: string | { pathname: string };
+    href: string | { pathname: string; query?: Record<string, string> };
     children: React.ReactNode;
   }) => (
-    <a href={typeof href === "string" ? href : href.pathname} {...props}>
+    <a
+      href={
+        typeof href === "string"
+          ? href
+          : `${href.pathname}${href.query ? `?${new URLSearchParams(href.query)}` : ""}`
+      }
+      {...props}
+    >
       {children}
     </a>
   ),
@@ -25,26 +32,12 @@ vi.mock("@/components/site/species-art-transition", () => ({
     children,
 }));
 
-const wikipedia = {
-  en: "https://en.wikipedia.org/wiki/Tree_sparrow",
-  ja: "https://ja.wikipedia.org/wiki/スズメ",
-  zhTw: "https://zh.wikipedia.org/zh-tw/麻雀",
-};
-
-const ebird = {
-  speciesCode: "eurtrs1",
-  url: "https://ebird.org/species/eurtrs1",
-};
-
 const labels = {
   play: "Play audio",
   pause: "Pause audio",
   loading: "Loading audio",
   retry: "Retry audio",
   unavailable: "Audio unavailable",
-  wikipedia: "Wikipedia",
-  ebird: "eBird",
-  opensNewTab: "opens in a new tab",
 };
 
 let roots: Array<{ root: Root; container: HTMLDivElement }> = [];
@@ -64,13 +57,10 @@ function renderCard() {
         imageUrl="https://images.example/sparrow.png"
         index={0}
         season="spring"
-        locale="ja"
         audio={{
           status: "available",
           url: "https://audio.example/sparrow.mp3",
         }}
-        wikipedia={wikipedia}
-        ebird={ebird}
         labels={labels}
       />,
     );
@@ -89,52 +79,27 @@ afterEach(() => {
 });
 
 describe("AtlasSpeciesCard", () => {
-  it("does not shrink the card on press", () => {
-    const container = renderCard();
-    const card = container.querySelector('[data-slot="card"]');
-
-    expect(card?.className).not.toContain("active:scale");
-    expect(card?.className).not.toContain("transition-transform");
-    expect(card?.className).toContain("shadow-[var(--raised)]");
-    expect(card?.className).not.toContain("ring-hairline");
-    expect(card?.className).not.toContain("focus-within:");
-  });
-
   it("keeps the detail link on the illustration and Locale common name", () => {
     const container = renderCard();
-    const detailLink = container.querySelector("a") as HTMLAnchorElement;
+    const detailLink = container.querySelector<HTMLAnchorElement>("a");
+    if (!detailLink) throw new Error("Missing species detail link");
 
     expect(detailLink.querySelector("img")).not.toBeNull();
     expect(detailLink.textContent).toContain("スズメ");
-    expect(detailLink.textContent).not.toContain("Passer montanus");
+    expect(detailLink.textContent).toContain("Passer montanus");
+    expect(detailLink.getAttribute("href")).toBe(
+      "/atlas/passer-montanus?season=spring",
+    );
     expect(container.textContent).toContain("Passer montanus");
   });
 
-  it("keeps audio, Wikipedia, and eBird as separate keyboard controls", () => {
+  it("keeps audio as a separate keyboard control and references on the detail page", () => {
     const container = renderCard();
-    const buttons = [...container.querySelectorAll("button")];
-    const links = [...container.querySelectorAll("a")];
+    const button = container.querySelector("button");
 
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0]?.type).toBe("button");
-    expect(buttons[0]?.getAttribute("aria-label")).toBe("Play audio");
-    expect(buttons[0]?.textContent).toBe("");
-    expect(buttons[0]?.querySelector("svg")).not.toBeNull();
-    expect(container.querySelector("img")?.className).toContain(
-      "atlas-card-specimen",
-    );
-    expect(
-      container.querySelector(".flex.items-center.justify-between"),
-    ).not.toBeNull();
-    expect(links.map((link) => link.textContent?.trim())).toEqual([
-      "スズメ",
-      "Wikipedia",
-      "eBird",
-    ]);
-    for (const link of links.slice(1)) {
-      expect(link.getAttribute("aria-label")).toContain("opens in a new tab");
-      expect(link.getAttribute("target")).toBe("_blank");
-      expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-    }
+    expect(button?.type).toBe("button");
+    expect(button?.getAttribute("aria-label")).toBe("Play audio");
+    expect(button?.closest("a")).toBeNull();
+    expect(container.querySelectorAll("a")).toHaveLength(1);
   });
 });

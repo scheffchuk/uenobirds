@@ -165,12 +165,12 @@ export function AtlasAudioControl({
           <Button
             type="button"
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             disabled={unavailable || state === "loading"}
             aria-label={label}
             aria-busy={state === "loading"}
             onClick={() => void handleClick()}
-            className="text-ink-soft hover:text-ink"
+            className="size-10 text-ink-soft hover:text-ink"
           >
             <Icon
               aria-hidden

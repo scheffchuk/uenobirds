@@ -5,7 +5,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { loadListedSpecies } from "@/lib/guide/load-listed-species";
 import { longFormForLocale, nameStackForLocale } from "@/lib/locale/species";
 import { AtlasDetailView } from "./AtlasDetailView";
-import { LocaleChromeBar, LocaleChromeBarFallback } from "@/components/site/LocaleChromeBar";
+import {
+  LocaleChromeBar,
+  LocaleChromeBarFallback,
+} from "@/components/site/LocaleChromeBar";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { loadMessages } from "@/i18n/load-messages";
@@ -74,67 +77,37 @@ async function AtlasSpeciesBody({
   ]);
   if (!species) notFound();
 
-  return (
-    <AtlasDetailView
-      species={species}
-      locale={localeRaw as AppLocale}
-    />
-  );
+  return <AtlasDetailView species={species} locale={localeRaw as AppLocale} />;
 }
 
 function AtlasDetailSkeleton() {
   return (
-    <div className="flex flex-1 flex-col gap-10" aria-hidden>
-      <div className="flex flex-col gap-1">
-        <div className="h-9 w-2/3 rounded-lg bg-paper-2 shadow-(--recess) md:h-10" />
-        <div className="h-7 w-1/3 rounded-md bg-paper-2 shadow-(--recess)" />
-        <div className="h-7 w-1/3 rounded-md bg-paper-2 shadow-(--recess)" />
-        <div className="h-5 w-1/4 rounded-full bg-paper-2 shadow-(--recess)" />
+    <div
+      className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-x-14 lg:gap-y-8"
+      aria-hidden
+    >
+      <div className="flex flex-col gap-1 lg:col-span-full">
+        <div className="h-9 w-2/3 rounded-lg bg-paper-2 md:h-10" />
+        <div className="h-7 w-1/3 rounded-md bg-paper-2" />
+        <div className="h-7 w-1/3 rounded-md bg-paper-2" />
+        <div className="h-5 w-1/4 rounded-md bg-paper-2" />
       </div>
-
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-        {Array.from({ length: 2 }, (_, i) => (
-          <div key={i} className="flex flex-col items-center gap-2">
-            <div className="aspect-square w-full max-w-xs rounded-2xl bg-paper-2 shadow-(--recess)" />
-            <div className="h-[1lh] w-16 rounded-full bg-paper-2 font-mono text-[10px] shadow-(--recess)" />
+      <div className="flex flex-col items-center gap-3">
+        <div className="aspect-square w-full max-w-60 rounded-xl bg-paper-2 sm:max-w-80 lg:max-w-100" />
+        <div className="h-8 w-36 rounded-lg bg-paper-2" />
+      </div>
+      <div className="flex flex-col gap-8">
+        {[0, 1].map((section) => (
+          <div key={section} className="flex flex-col gap-4">
+            <div className="h-7 w-32 rounded-md bg-paper-2" />
+            <div className="flex flex-col gap-3">
+              {[0, 1, 2, 3].map((line) => (
+                <div key={line} className="h-4 rounded-md bg-paper-2" />
+              ))}
+            </div>
           </div>
         ))}
       </div>
-
-      <div className="flex flex-col gap-4">
-        <div className="h-7 w-28 rounded-md bg-paper-2 shadow-(--recess)" />
-        <div className="flex flex-col text-base leading-relaxed">
-          {[0, 1, 2].map((line) => (
-            <div key={line} className="flex h-[1lh] items-center">
-              <div className="h-4 w-full rounded-full bg-paper-2 shadow-(--recess)" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <div className="h-7 w-36 rounded-md bg-paper-2 shadow-(--recess)" />
-        <div className="grid grid-cols-4 items-end gap-3 border-t border-hairline pt-4">
-          {[60, 85, 45, 70].map((height) => (
-            <div key={height} className="flex flex-col items-center gap-2">
-              <div className="h-4 w-4 rounded-full bg-paper-2 shadow-(--recess)" />
-              <div className="flex h-36 w-full items-end justify-center">
-                <div
-                  className="w-full max-w-12 rounded-t-md bg-paper-2 shadow-(--recess)"
-                  style={{ height: `${height}%` }}
-                />
-              </div>
-              <div className="h-4 w-10 rounded-full bg-paper-2 shadow-(--recess)" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <div className="h-7 w-40 rounded-full bg-paper-2 shadow-(--recess)" />
-        <div className="h-7 w-32 rounded-full bg-paper-2 shadow-(--recess)" />
-      </div>
-      <div className="size-8" />
     </div>
   );
 }
@@ -145,8 +118,10 @@ export default function AtlasSpeciesPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-6 py-10 md:px-8">
-      <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
+    <article className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-6 pt-4 pb-10 md:px-8 md:pt-5">
+      <AnimatedSuspense
+        fallback={<LocaleChromeBarFallback showTrailing={false} />}
+      >
         <AtlasSpeciesChrome />
       </AnimatedSuspense>
       <AnimatedSuspense fallback={<AtlasDetailSkeleton />}>

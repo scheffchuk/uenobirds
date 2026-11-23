@@ -1,16 +1,13 @@
-import Image from "next/image";
 import { ExternalLinkIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { SpeciesRecord } from "@/lib/guide/types";
-import {
-  longFormForLocale,
-  nameStackForLocale,
-} from "@/lib/locale/species";
+import { longFormForLocale, nameStackForLocale } from "@/lib/locale/species";
 import { SeasonLink } from "@/components/season/SeasonLink";
-import { SpeciesArtTransition } from "@/components/site/species-art-transition";
+import { SpeciesIllustrations } from "./SpeciesIllustrations";
 import { PrevalenceChart } from "./PrevalenceChart";
 import type { AppLocale } from "@/i18n/routing";
 import { wikipediaUrlForLocale } from "@/lib/audio/links";
+import { cn } from "@/lib/utils";
 
 function hasText(value: string | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -32,8 +29,15 @@ export async function AtlasDetailView({
   const wikipediaUrl = wikipediaUrlForLocale(species.wikipedia, locale);
 
   return (
-    <div className="flex flex-1 flex-col gap-10">
-      <header className="flex flex-col gap-1">
+    <div
+      className={cn(
+        "grid flex-1 grid-cols-1 gap-6 lg:items-start lg:gap-x-14 lg:gap-y-8",
+        hasArt
+          ? "lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
+          : "mx-auto w-full max-w-2xl",
+      )}
+    >
+      <header className="flex flex-col gap-1 lg:col-span-full">
         <h1 className="font-heading text-3xl tracking-tight text-ink md:text-4xl">
           {stack.primary}
         </h1>
@@ -46,102 +50,79 @@ export async function AtlasDetailView({
       </header>
 
       {hasArt ? (
-        <section
-          className="grid grid-cols-1 gap-8 sm:grid-cols-2"
-          aria-label={t("illustrations")}
-        >
-          {species.perchUrl ? (
-            <figure className="flex flex-col items-center gap-2">
-              <div className="relative aspect-square w-full max-w-xs">
-                <SpeciesArtTransition slug={species.slug}>
-                  <Image
-                    src={species.perchUrl}
-                    alt={t("altPerched", { name: stack.primary })}
-                    fill
-                    sizes="320px"
-                    className="object-contain"
-                    loading="eager"
-                    fetchPriority="high"
-                  />
-                </SpeciesArtTransition>
-              </div>
-              <figcaption className="font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase">
-                {t("perched")}
-              </figcaption>
-            </figure>
-          ) : null}
-          {species.flightUrl ? (
-            <figure className="flex flex-col items-center gap-2">
-              <div className="relative aspect-square w-full max-w-xs">
-                <Image
-                  src={species.flightUrl}
-                  alt={t("altFlight", { name: stack.primary })}
-                  fill
-                  sizes="320px"
-                  className="object-contain"
-                  loading="eager"
-                  fetchPriority={species.perchUrl ? "auto" : "high"}
-                />
-              </div>
-              <figcaption className="font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase">
-                {t("flight")}
-              </figcaption>
-            </figure>
-          ) : null}
-        </section>
-      ) : null}
-
-      {hasText(description) ? (
-        <section className="flex flex-col gap-4">
-          <h2 className="font-heading text-xl text-ink">{t("about")}</h2>
-          <p className="text-base leading-relaxed whitespace-pre-wrap text-ink-2">
-            {description}
-          </p>
-        </section>
-      ) : null}
-
-      {hasText(spottingTips) ? (
-        <section className="flex flex-col gap-4">
-          <h2 className="font-heading text-xl text-ink">{t("spottingTips")}</h2>
-          <p className="text-base leading-relaxed whitespace-pre-wrap text-ink-2">
-            {spottingTips}
-          </p>
-        </section>
-      ) : null}
-
-      <section className="flex flex-col gap-4">
-        <h2 className="font-heading text-xl text-ink">{t("prevalence")}</h2>
-        <PrevalenceChart prevalence={species.prevalence} />
-      </section>
-
-      {wikipediaUrl || species.ebird?.url ? (
-        <div className="flex flex-wrap gap-2">
-          {wikipediaUrl ? (
-            <a
-              href={wikipediaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-paper-2 px-4 py-2 font-mono text-[10px] tracking-[0.14em] text-ink uppercase shadow-[var(--recess)] transition-colors hover:text-ink-2"
-            >
-              {t("viewOnWikipedia")}
-              <ExternalLinkIcon aria-hidden className="size-3" />
-            </a>
-          ) : null}
-          {species.ebird?.url ? (
-            <a
-              href={species.ebird.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-paper-2 px-4 py-2 font-mono text-[10px] tracking-[0.14em] text-ink uppercase shadow-[var(--recess)] transition-colors hover:text-ink-2"
-            >
-              {t("viewOnEbird")}
-              <ExternalLinkIcon aria-hidden className="size-3" />
-            </a>
-          ) : null}
+        <div className="lg:sticky lg:top-8 lg:col-start-1 lg:row-start-2">
+          <SpeciesIllustrations
+            key={species.slug}
+            species={{
+              slug: species.slug,
+              perchUrl: species.perchUrl,
+              flightUrl: species.flightUrl,
+            }}
+            name={stack.primary}
+          />
         </div>
       ) : null}
 
-      <SeasonLink pathname="/" backLabel={tNav("backToCollage")} />
+      <div
+        className={cn(
+          "flex min-w-0 flex-col gap-8",
+          hasArt && "lg:col-start-2",
+        )}
+      >
+        {hasText(spottingTips) ? (
+          <section className="flex flex-col gap-4">
+            <h2 className="font-heading text-xl text-ink">
+              {t("spottingTips")}
+            </h2>
+            <p className="text-base leading-relaxed whitespace-pre-wrap text-ink-2">
+              {spottingTips}
+            </p>
+          </section>
+        ) : null}
+
+        {hasText(description) ? (
+          <section className="flex flex-col gap-4">
+            <h2 className="font-heading text-xl text-ink">{t("about")}</h2>
+            <p className="text-base leading-relaxed whitespace-pre-wrap text-ink-2">
+              {description}
+            </p>
+          </section>
+        ) : null}
+
+        <section className="flex flex-col gap-4">
+          <h2 className="font-heading text-xl text-ink">{t("prevalence")}</h2>
+          <PrevalenceChart prevalence={species.prevalence} />
+        </section>
+
+        {wikipediaUrl || species.ebird?.url ? (
+          <div className="flex flex-wrap gap-2">
+            {wikipediaUrl ? (
+              <a
+                href={wikipediaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full bg-paper-2 px-4 py-2 font-mono text-[10px] tracking-[0.14em] text-ink uppercase shadow-[var(--recess)] transition-colors hover:text-ink-2"
+              >
+                {t("viewOnWikipedia")}
+                <ExternalLinkIcon aria-hidden className="size-3" />
+              </a>
+            ) : null}
+            {species.ebird?.url ? (
+              <a
+                href={species.ebird.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full bg-paper-2 px-4 py-2 font-mono text-[10px] tracking-[0.14em] text-ink uppercase shadow-[var(--recess)] transition-colors hover:text-ink-2"
+              >
+                {t("viewOnEbird")}
+                <ExternalLinkIcon aria-hidden className="size-3" />
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+
+        <SeasonLink pathname="/" backLabel={tNav("backToCollage")} />
+      </div>
     </div>
   );
 }

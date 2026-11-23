@@ -3,6 +3,7 @@ import { SeasonFilterControl } from "@/components/season/SeasonFilterControl";
 import type { SeasonPickerPath } from "@/lib/season/url";
 import { AtlasSpeciesCard } from "./AtlasSpeciesCard";
 import { AtlasPlaybackProvider } from "@/components/atlas/AtlasPlaybackProvider";
+import { AtlasSearch } from "./AtlasSearch";
 import {
   Empty,
   EmptyDescription,
@@ -14,7 +15,7 @@ import { commonNameForLocale } from "@/lib/locale/species";
 import type { SeasonFilter } from "@/lib/season/types";
 import type { AppLocale } from "@/i18n/routing";
 
-/** Server-filtered Atlas list. Season picker and audio stay client islands. */
+/** Season filtering and cards render on the server; search and audio are client islands. */
 export async function AtlasListView({
   species,
   season,
@@ -36,13 +37,10 @@ export async function AtlasListView({
     loading: t("loadingAudio"),
     retry: t("retryAudio"),
     unavailable: t("audioUnavailable"),
-    wikipedia: t("wikipedia"),
-    ebird: t("ebird"),
-    opensNewTab: t("opensNewTab"),
   };
 
   return (
-    <div className="group flex flex-col gap-8">
+    <div className="group flex flex-col gap-4">
       <p className="text-center text-sm text-ink-soft">
         {t(`subtitle.${season}`)}
       </p>
@@ -62,9 +60,17 @@ export async function AtlasListView({
         </Empty>
       ) : (
         <AtlasPlaybackProvider>
-          <ul className="grid grid-cols-1 gap-4 group-has-[[data-filtering]]:opacity-60 group-has-[[data-filtering]]:transition-opacity sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-            {rows.map((row, index) => (
-              <li key={row.slug}>
+          <AtlasSearch
+            key={season}
+            items={rows.map((row, index) => ({
+              slug: row.slug,
+              names: [
+                row.comNameEn,
+                row.comNameJa,
+                row.comNameZhTw,
+                row.sciName,
+              ].join(" "),
+              content: (
                 <AtlasSpeciesCard
                   slug={row.slug}
                   comName={commonNameForLocale(row, locale)}
@@ -72,15 +78,12 @@ export async function AtlasListView({
                   imageUrl={row.imageUrl}
                   index={index}
                   season={season}
-                  locale={locale}
                   audio={row.audio}
-                  ebird={row.ebird}
-                  wikipedia={row.wikipedia}
                   labels={cardLabels}
                 />
-              </li>
-            ))}
-          </ul>
+              ),
+            }))}
+          />
         </AtlasPlaybackProvider>
       )}
     </div>

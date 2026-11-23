@@ -118,7 +118,7 @@
  */
 .collage-frame {
   position: absolute;
-  inset: 0;
+  inset: 8px;
   display: flex;
   align-items: center;
   justify-content: center;

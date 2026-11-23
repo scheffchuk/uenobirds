@@ -60,37 +60,24 @@ test.beforeEach(async ({ page }) => {
     });
   });
 
-  await page.context().route("https://audio.test/**", (route) =>
-    route.abort("blockedbyclient"),
-  );
-  await page.context().route("https://*.convex.cloud/**", (route) =>
-    route.abort("blockedbyclient"),
-  );
+  await page
+    .context()
+    .route("https://audio.test/**", (route) => route.abort("blockedbyclient"));
+  await page
+    .context()
+    .route("https://*.convex.cloud/**", (route) =>
+      route.abort("blockedbyclient"),
+    );
   for (const service of [
     "https://*.convex.site/**",
     "https://xeno-canto.org/**",
     "https://api.ebird.org/**",
     "https://query.wikidata.org/**",
   ]) {
-    await page.context().route(service, (route) =>
-      route.abort("blockedbyclient"),
-    );
+    await page
+      .context()
+      .route(service, (route) => route.abort("blockedbyclient"));
   }
-  await page.context().route("https://wikipedia.test/**", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "text/html",
-      body: "<!doctype html><title>Stub Wikipedia</title>",
-    }),
-  );
-  await page.context().route("https://ebird.test/**", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "text/html",
-      body: "<!doctype html><title>Stub eBird</title>",
-    }),
-  );
-
   await page.goto("/en/atlas/test-fixture?season=all");
   await expect(
     page.getByRole("heading", { name: "Atlas browser fixture" }),
@@ -108,9 +95,7 @@ test("plays, pauses, resumes, completes, and keeps playback exclusive", async ({
   await expect(page.locator("audio")).toHaveCount(3);
   await expect(winter.locator("audio")).toHaveAttribute("preload", "none");
   await expect(winter.locator("audio")).not.toHaveAttribute("src");
-  expect(
-    await getAudioTestState(page),
-  ).toMatchObject({ playCalls: 0 });
+  expect(await getAudioTestState(page)).toMatchObject({ playCalls: 0 });
 
   await winterButton.click();
   await expect(winterButton).toHaveAccessibleName("Pause audio");
@@ -130,12 +115,10 @@ test("plays, pauses, resumes, completes, and keeps playback exclusive", async ({
   await expect(summerButton).toHaveAccessibleName("Play audio");
   await expect(summer.locator("audio")).not.toHaveAttribute("src");
 
-  expect(
-    await getAudioTestState(page),
-  ).toMatchObject({ playCalls: 3 });
+  expect(await getAudioTestState(page)).toMatchObject({ playCalls: 3 });
 });
 
-test("recovers from failure, exposes unavailable state, supports keyboard use, and stubs references", async ({
+test("recovers from failure, exposes unavailable state, and supports keyboard use", async ({
   page,
 }) => {
   const winter = card(page, "Winter Demo Bird");
@@ -150,44 +133,20 @@ test("recovers from failure, exposes unavailable state, supports keyboard use, a
     ).__atlasAudioTest.failNextPlay = true;
   });
   await winterButton.press("Enter");
-  await expect(winter.getByRole("button", { name: "Retry audio" })).toBeVisible();
+  await expect(
+    winter.getByRole("button", { name: "Retry audio" }),
+  ).toBeVisible();
 
   await winter.getByRole("button", { name: "Retry audio" }).click();
-  await expect(winter.getByRole("button", { name: "Pause audio" })).toBeVisible();
+  await expect(
+    winter.getByRole("button", { name: "Pause audio" }),
+  ).toBeVisible();
 
   const unavailableButton = unavailable.getByRole("button", {
     name: "Audio unavailable",
   });
   await expect(unavailableButton).toBeDisabled();
   await expect(unavailable.locator("audio")).not.toHaveAttribute("src");
-
-  const wikipedia = winter.getByRole("link", { name: /Wikipedia/ });
-  const ebird = winter.getByRole("link", { name: /eBird/ });
-  await expect(wikipedia).toHaveAttribute(
-    "href",
-    "https://wikipedia.test/wiki/Winter_Demo_Bird",
-  );
-  await expect(ebird).toHaveAttribute(
-    "href",
-    "https://ebird.test/species/windem1",
-  );
-  for (const link of [wikipedia, ebird]) {
-    await expect(link).toHaveAttribute("target", "_blank");
-    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    await expect(link).toHaveAccessibleName(/opens in a new tab/);
-  }
-
-  const wikipediaPopup = page.waitForEvent("popup");
-  await wikipedia.click();
-  const popup = await wikipediaPopup;
-  await expect(popup).toHaveURL("https://wikipedia.test/wiki/Winter_Demo_Bird");
-  await popup.close();
-
-  const ebirdPopup = page.waitForEvent("popup");
-  await ebird.click();
-  const ebirdPage = await ebirdPopup;
-  await expect(ebirdPage).toHaveURL("https://ebird.test/species/windem1");
-  await ebirdPage.close();
 });
 
 test("filters by Season and resets audio when a card leaves the list", async ({
@@ -195,7 +154,9 @@ test("filters by Season and resets audio when a card leaves the list", async ({
 }) => {
   const winter = card(page, "Winter Demo Bird");
   await winter.getByRole("button", { name: "Play audio" }).click();
-  await expect(winter.getByRole("button", { name: "Pause audio" })).toBeVisible();
+  await expect(
+    winter.getByRole("button", { name: "Pause audio" }),
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Summer", exact: true }).click();
   await expect(page).toHaveURL(/season=summer/);
@@ -210,4 +171,39 @@ test("filters by Season and resets audio when a card leaves the list", async ({
     restoredWinter.getByRole("button", { name: "Play audio" }),
   ).toBeVisible();
   await expect(restoredWinter.locator("audio")).not.toHaveAttribute("src");
+});
+
+test("searches across languages and scientific names, clears no results, and stops hidden audio", async ({
+  page,
+}) => {
+  const search = page.getByRole("searchbox");
+  const winter = card(page, "Winter Demo Bird");
+  await winter.getByRole("button", { name: "Play audio" }).click();
+  await expect(
+    winter.getByRole("button", { name: "Pause audio" }),
+  ).toBeVisible();
+
+  await search.fill("夏季測試鳥");
+  await expect(card(page, "Summer Demo Bird")).toBeVisible();
+  await expect(winter).toHaveCount(0);
+  await expect(page.getByRole("status")).toHaveText("1 bird");
+
+  await search.fill("DEMO avis AESTIVA");
+  await expect(card(page, "Summer Demo Bird")).toBeVisible();
+  await search.fill("冬のテスト鳥");
+  await expect(
+    winter.getByRole("button", { name: "Play audio" }),
+  ).toBeVisible();
+  await expect(winter.locator("audio")).not.toHaveAttribute("src");
+
+  await search.fill("no-such-bird");
+  await expect(page.getByText("No matching birds")).toBeVisible();
+  await page.getByRole("button", { name: "Clear search" }).click();
+  await expect(search).toHaveValue("");
+  await expect(page.locator("audio")).toHaveCount(3);
+
+  await search.fill("Winter");
+  await page.getByRole("link", { name: "Summer", exact: true }).click();
+  await expect(search).toHaveValue("");
+  await expect(card(page, "Summer Demo Bird")).toBeVisible();
 });

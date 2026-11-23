@@ -31,7 +31,13 @@
     "audioUnavailable": "暫無錄音",
     "wikipedia": "Wikipedia",
     "ebird": "eBird",
-    "opensNewTab": "在新分頁開啟"
+    "opensNewTab": "在新分頁開啟",
+    "searchLabel": "以各語言的鳥名搜尋",
+    "searchPlaceholder": "搜尋鳥名…",
+    "results": "{count} 種鳥",
+    "noResultsTitle": "找不到符合的鳥類",
+    "noResultsDescription": "試試中文、日文、英文鳥名或學名。",
+    "clearSearch": "清除搜尋"
   },
   "AtlasDetail": {
     "about": "認識牠",
@@ -50,7 +56,8 @@
     "ariaLabel": "上野的鳥類拼貼",
     "emptyTitle": "這個季節的插畫還在準備中",
     "emptyDescription": "過陣子再來看看，或先逛逛圖鑑吧。",
-    "browseAtlas": "瀏覽圖鑑"
+    "browseAtlas": "瀏覽圖鑑",
+    "hint": "點選鳥兒認識牠。越常遇見的鳥，插畫就越大。"
   },
   "Season": {
     "winter": "冬天",
