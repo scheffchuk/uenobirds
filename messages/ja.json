@@ -50,6 +50,10 @@
     "illustrations": "イラスト",
     "altPerched": "{name}の止まり姿",
     "altFlight": "{name}の飛ぶ姿",
+    "voice": "鳴き声",
+    "loop": "リピート",
+    "loopAudio": "リピート再生を切り替え",
+    "scrubAudio": "鳴き声の再生位置を移動",
     "notFound": "お探しの鳥が見つかりません"
   },
   "Collage": {

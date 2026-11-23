@@ -50,6 +50,10 @@
     "illustrations": "插畫",
     "altPerched": "{name}（停棲）",
     "altFlight": "{name}（飛翔）",
+    "voice": "鳥鳴",
+    "loop": "循環",
+    "loopAudio": "切換循環播放",
+    "scrubAudio": "調整鳥鳴播放進度",
     "notFound": "找不到這隻鳥"
   },
   "Collage": {

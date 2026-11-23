@@ -4,6 +4,7 @@ import type { SpeciesRecord } from "@/lib/guide/types";
 import { longFormForLocale, nameStackForLocale } from "@/lib/locale/species";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { SpeciesIllustrations } from "./SpeciesIllustrations";
+import { SpeciesVoicePlayer } from "./SpeciesVoicePlayer";
 import { PrevalenceChart } from "./PrevalenceChart";
 import type { AppLocale } from "@/i18n/routing";
 import { wikipediaUrlForLocale } from "@/lib/audio/links";
@@ -93,6 +94,8 @@ export async function AtlasDetailView({
               </p>
             </section>
           ) : null}
+
+          <SpeciesVoicePlayer slug={species.slug} audio={species.audio} />
 
           <section className="postcard-panel postcard-tail-panel flex flex-col gap-3 px-5 py-4 sm:px-6 sm:py-5">
             <h2 className="editorial-section-heading">{t("prevalence")}</h2>
