@@ -1,6 +1,5 @@
 "use client";
 
-import { XIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
@@ -11,7 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
 import { stripLocalePrefix } from "@/lib/season/canonicalize";
 import { cn } from "@/lib/utils";
 
@@ -153,7 +151,7 @@ export function PostcardModal({
         ref={dialogRef}
         tabIndex={-1}
         className={cn(
-          "postcard-modal-frame relative z-10 flex max-h-[calc(100dvh-12px)] w-full max-w-[940px] flex-col overflow-hidden rounded-t-2xl outline-none md:max-h-[min(88dvh,760px)] md:rounded-[4px]",
+          "postcard-modal-frame relative z-10 flex max-h-[calc(100dvh-12px)] w-full max-w-[820px] flex-col overflow-hidden rounded-t-2xl outline-none md:max-h-[min(86dvh,600px)] md:rounded-[6px]",
           dragging && "transition-none",
         )}
         style={dragY > 0 ? { transform: `translateY(${dragY}px)` } : undefined}
@@ -180,18 +178,6 @@ export function PostcardModal({
             className="h-1 w-10 rounded-full bg-ink/25"
           />
         </button>
-
-        {/* Close button */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={dismiss}
-          aria-label={t("closeModal")}
-          className="absolute top-2.5 right-2.5 z-30 size-8 rounded-full bg-background/95 text-ink-soft shadow-(--raised) hover:bg-background hover:text-ink active:scale-95 md:top-3.5 md:right-3.5"
-        >
-          <XIcon aria-hidden className="size-4" />
-        </Button>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-(--card-stock) p-1.5 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:p-0">
           {children}

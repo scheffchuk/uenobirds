@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowLeftIcon } from "lucide-react";
@@ -7,6 +8,8 @@ import {
   LocaleChromeBar,
   LocaleChromeBarFallback,
 } from "@/components/site/LocaleChromeBar";
+import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
+import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { buttonVariants } from "@/components/ui/button";
 import { FastLink } from "@/components/ui/fast-link";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
@@ -92,13 +95,18 @@ async function AudioBody() {
 
 export default function AudioPage() {
   return (
-    <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 py-12 md:px-8">
-      <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
-        <AudioChrome />
-      </AnimatedSuspense>
-      <AnimatedSuspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
-        <AudioBody />
-      </AnimatedSuspense>
-    </article>
+    <>
+      <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 py-12 md:px-8">
+        <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
+          <AudioChrome />
+        </AnimatedSuspense>
+        <AnimatedSuspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
+          <AudioBody />
+        </AnimatedSuspense>
+      </article>
+      <Suspense fallback={<SiteFooterFallback />}>
+        <LocaleSiteFooter />
+      </Suspense>
+    </>
   );
 }

@@ -1,9 +1,13 @@
 import { getLocale } from "next-intl/server";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteFooter, type FooterClearance } from "@/components/site/SiteFooter";
 import type { AppLocale } from "@/i18n/routing";
 
 /** Footer for Locale routes — Locale from next-intl / root params. */
-export async function LocaleSiteFooter() {
+export async function LocaleSiteFooter({
+  clearance = "none",
+}: {
+  clearance?: FooterClearance;
+} = {}) {
   const locale = (await getLocale()) as AppLocale;
-  return <SiteFooter locale={locale} />;
+  return <SiteFooter locale={locale} clearance={clearance} />;
 }

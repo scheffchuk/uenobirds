@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from "lucide-react";
+import { ArrowUpRightIcon } from "lucide-react";
 
 export type SpeciesReferenceLabels = {
   wikipedia: string;
@@ -33,7 +33,7 @@ export function SpeciesReferenceLinks({
           className="postcard-action-pill"
         >
           <span>{compact ? labels.wikipedia : labels.viewOnWikipedia}</span>
-          <ExternalLinkIcon aria-hidden className="size-2.5" />
+          <ArrowUpRightIcon aria-hidden className="size-3 text-ink-soft" />
         </a>
       ) : null}
       {ebirdUrl ? (
@@ -45,7 +45,7 @@ export function SpeciesReferenceLinks({
           className="postcard-action-pill"
         >
           <span>{compact ? labels.ebird : labels.viewOnEbird}</span>
-          <ExternalLinkIcon aria-hidden className="size-2.5" />
+          <ArrowUpRightIcon aria-hidden className="size-3 text-ink-soft" />
         </a>
       ) : null}
     </div>

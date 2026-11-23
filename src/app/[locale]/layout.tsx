@@ -5,8 +5,6 @@ import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { RootShell } from "@/components/site/RootShell";
 import { MorphingCornerMenu } from "@/components/site/MorphingCornerMenu";
 import { BottomViewSwitcher } from "@/components/site/BottomViewSwitcher";
-import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
-import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { OfflineIndicator } from "@/components/site/offline-indicator";
 import { pickClientMessages } from "@/i18n/client-messages";
 import { toHtmlLang } from "@/i18n/html-lang";
@@ -66,9 +64,6 @@ export default async function LocaleLayout({
           {modal}
           <Suspense fallback={null}>
             <BottomViewSwitcher copy={switcherCopy} />
-          </Suspense>
-          <Suspense fallback={<SiteFooterFallback />}>
-            <LocaleSiteFooter />
           </Suspense>
           <Suspense fallback={null}>
             <OfflineIndicator />

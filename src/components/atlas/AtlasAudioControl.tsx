@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAtlasPlayback } from "@/components/atlas/AtlasPlaybackProvider";
+import { cn } from "@/lib/utils";
 
 type AudioControlState = "idle" | "loading" | "playing" | "paused" | "error";
 
@@ -31,6 +32,8 @@ export function AtlasAudioControl({
   audioUrl,
   available,
   labels,
+  showTooltip = true,
+  className,
   onPlayRequest,
   onPause,
   onEnded,
@@ -41,6 +44,8 @@ export function AtlasAudioControl({
   audioUrl?: string;
   available: boolean;
   labels: AtlasAudioLabels;
+  showTooltip?: boolean;
+  className?: string;
   onPlayRequest?: (audio: HTMLAudioElement) => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -158,56 +163,73 @@ export function AtlasAudioControl({
             ? SquareIcon
             : AudioLinesIcon;
 
+  const button = (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      disabled={unavailable || state === "loading"}
+      aria-label={label}
+      aria-busy={state === "loading"}
+      onClick={() => void handleClick()}
+      className={cn("size-10 text-ink-soft hover:text-ink", className)}
+    >
+      <Icon
+        aria-hidden
+        className={state === "loading" ? "animate-spin" : undefined}
+      />
+    </Button>
+  );
+
+  const audio = (
+    <audio
+      ref={registerAudio}
+      preload="none"
+      aria-hidden="true"
+      onPlaying={() => setState("playing")}
+      onPause={() => {
+        playAttempt.current += 1;
+        setState("paused");
+      }}
+      onEnded={() => {
+        playAttempt.current += 1;
+        const audio = audioRef.current;
+        if (audio) {
+          audio.currentTime = 0;
+          audio.removeAttribute("src");
+          audio.load();
+        }
+        setState("idle");
+        if (slug) playback?.release(slug);
+        onEnded?.();
+      }}
+      onError={() => {
+        playAttempt.current += 1;
+        setState("error");
+        if (slug) playback?.release(slug);
+        onError?.();
+      }}
+    />
+  );
+
+  if (!showTooltip) {
+    return (
+      <>
+        {button}
+        {audio}
+      </>
+    );
+  }
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger render={<span className="inline-flex" />}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={unavailable || state === "loading"}
-            aria-label={label}
-            aria-busy={state === "loading"}
-            onClick={() => void handleClick()}
-            className="size-10 text-ink-soft hover:text-ink"
-          >
-            <Icon
-              aria-hidden
-              className={state === "loading" ? "animate-spin" : undefined}
-            />
-          </Button>
+          {button}
         </TooltipTrigger>
         <TooltipContent>{label}</TooltipContent>
       </Tooltip>
-      <audio
-        ref={registerAudio}
-        preload="none"
-        aria-hidden="true"
-        onPlaying={() => setState("playing")}
-        onPause={() => {
-          playAttempt.current += 1;
-          setState("paused");
-        }}
-        onEnded={() => {
-          playAttempt.current += 1;
-          const audio = audioRef.current;
-          if (audio) {
-            audio.currentTime = 0;
-            audio.removeAttribute("src");
-            audio.load();
-          }
-          setState("idle");
-          if (slug) playback?.release(slug);
-          onEnded?.();
-        }}
-        onError={() => {
-          playAttempt.current += 1;
-          setState("error");
-          if (slug) playback?.release(slug);
-          onError?.();
-        }}
-      />
+      {audio}
     </TooltipProvider>
   );
 }

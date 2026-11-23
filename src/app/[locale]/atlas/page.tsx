@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AtlasListView } from "./AtlasListView";
 import { CompactScrollHeader } from "@/components/atlas/CompactScrollHeader";
+import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
+import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { SeasonPickerSkeleton } from "@/components/season/SeasonPickerSkeleton";
 import { loadMessages } from "@/i18n/load-messages";
@@ -92,14 +95,21 @@ export default function AtlasPage({
   searchParams: Promise<SeasonSearch>;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-4 pt-2 pb-24 sm:px-6 md:px-8">
-      <AnimatedSuspense fallback={<AtlasChromeFallback />}>
-        <AtlasChrome />
-      </AnimatedSuspense>
+    <>
+      <div className="flex w-full flex-1 flex-col">
+        <AnimatedSuspense fallback={<AtlasChromeFallback />}>
+          <AtlasChrome />
+        </AnimatedSuspense>
 
-      <AnimatedSuspense fallback={<AtlasListSkeleton />}>
-        <AtlasListSection searchParams={searchParams} />
-      </AnimatedSuspense>
-    </div>
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-4 pt-2 pb-4 sm:px-6 md:px-8">
+          <AnimatedSuspense fallback={<AtlasListSkeleton />}>
+            <AtlasListSection searchParams={searchParams} />
+          </AnimatedSuspense>
+        </div>
+      </div>
+      <Suspense fallback={<SiteFooterFallback clearance="switcher" />}>
+        <LocaleSiteFooter clearance="switcher" />
+      </Suspense>
+    </>
   );
 }

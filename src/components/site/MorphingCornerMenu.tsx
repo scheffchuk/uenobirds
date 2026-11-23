@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { getPathname } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { stripLocalePrefix } from "@/lib/season/canonicalize";
-import { useCollageLabelsVisible } from "@/lib/collage/label-preference";
 import { FastLink } from "@/components/ui/fast-link";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +21,7 @@ export type CornerMenuCopy = {
 
 /**
  * Top-right corner shell that morphs seamlessly from a pill trigger into a
- * rounded card containing Locale selection, Collage label toggle, and About link.
+ * rounded card containing Locale selection and About link.
  */
 export function MorphingCornerMenu({
   copy,
@@ -32,11 +31,9 @@ export function MorphingCornerMenu({
   className?: string;
 }) {
   const tLocale = useTranslations("LocaleSwitcher");
-  const tCollage = useTranslations("Collage");
   const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [labelsVisible, setLabelsVisible] = useCollageLabelsVisible();
   const shellRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
@@ -128,37 +125,6 @@ export function MorphingCornerMenu({
                   );
                 })}
               </div>
-            </div>
-
-            {/* Collage bird labels toggle */}
-            <div className="flex items-center justify-between gap-3 border-t border-hairline pt-3">
-              <span className="px-1 text-xs text-ink-2">
-                {tCollage("labelsToggle")}
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={labelsVisible}
-                aria-label={
-                  labelsVisible
-                    ? tCollage("hideLabels")
-                    : tCollage("showLabels")
-                }
-                tabIndex={open ? 0 : -1}
-                onClick={() => setLabelsVisible(!labelsVisible)}
-                className={cn(
-                  "relative h-5 w-9 shrink-0 rounded-full p-0.5 shadow-(--recess) transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-                  labelsVisible ? "bg-ink-2" : "bg-paper-2",
-                )}
-              >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "block size-4 rounded-full bg-background shadow-(--raised) transition-transform duration-200",
-                    labelsVisible ? "translate-x-4" : "translate-x-0",
-                  )}
-                />
-              </button>
             </div>
 
             {/* About link */}

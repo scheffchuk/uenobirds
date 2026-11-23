@@ -1,10 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import type { SpeciesRecord } from "@/lib/guide/types";
 import { longFormForLocale, nameStackForLocale } from "@/lib/locale/species";
-import { SeasonLink } from "@/components/season/SeasonLink";
+import {
+  AtlasAudioControl,
+  type AtlasAudioLabels,
+} from "@/components/atlas/AtlasAudioControl";
 import { SpeciesIllustrations } from "./SpeciesIllustrations";
 import { SpeciesReferenceLinks } from "./SpeciesReferenceLinks";
-import { SpeciesVoicePlayer } from "./SpeciesVoicePlayer";
 import { PrevalenceChart } from "./PrevalenceChart";
 import type { AppLocale } from "@/i18n/routing";
 import { wikipediaUrlForLocale } from "@/lib/audio/links";
@@ -23,15 +25,17 @@ export async function AtlasDetailView({
   locale: AppLocale;
   inModal?: boolean;
 }) {
-  const [t, tAtlas, tNav] = await Promise.all([
+  const [t, tAtlas] = await Promise.all([
     getTranslations("AtlasDetail"),
     getTranslations("Atlas"),
-    getTranslations("Nav"),
   ]);
   const stack = nameStackForLocale(species, locale);
   const description = longFormForLocale(species, "description", locale);
   const spottingTips = longFormForLocale(species, "spottingTips", locale);
+  const hasCopy = hasText(description) || hasText(spottingTips);
   const hasArt = Boolean(species.perchUrl || species.flightUrl);
+  const hasAudio =
+    species.audio?.status === "available" && Boolean(species.audio.url);
   const wikipediaUrl = wikipediaUrlForLocale(species.wikipedia, locale);
   const ebirdUrl = species.ebird?.url;
   const refLabels = {
@@ -41,27 +45,28 @@ export async function AtlasDetailView({
     viewOnEbird: t("viewOnEbird"),
     opensNewTab: tAtlas("opensNewTab"),
   };
+  const audioLabels: AtlasAudioLabels = {
+    play: tAtlas("playAudio"),
+    pause: tAtlas("pauseAudio"),
+    loading: tAtlas("loadingAudio"),
+    retry: tAtlas("retryAudio"),
+    unavailable: tAtlas("audioUnavailable"),
+  };
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
+    <div className={cn("flex flex-1 flex-col", !inModal && "justify-center")}>
       <div
         className={cn(
-          "postcard-sheet grid grid-cols-1 gap-2 p-2",
+          "postcard-sheet grid grid-cols-1 gap-1.5 p-1.5 sm:gap-2 sm:p-2",
           hasArt
-            ? "lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:items-start"
-            : "mx-auto w-full max-w-2xl",
+            ? "md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:items-stretch"
+            : "mx-auto w-full max-w-xl",
+          !inModal && "mx-auto w-full max-w-[820px]",
           inModal && "postcard-sheet-modal",
         )}
       >
         {hasArt ? (
-          <div
-            className={cn(
-              "flex min-w-0 lg:sticky lg:self-start",
-              inModal
-                ? "lg:top-2 lg:h-[min(calc(88dvh-16px),660px)]"
-                : "lg:top-6 lg:h-[min(calc(100dvh-6rem),640px)]",
-            )}
-          >
+          <div className="flex min-w-0">
             <SpeciesIllustrations
               key={species.slug}
               species={{
@@ -71,77 +76,86 @@ export async function AtlasDetailView({
               }}
               name={stack.primary}
               footerEnd={
-                <SpeciesReferenceLinks
-                  wikipediaUrl={wikipediaUrl}
-                  ebirdUrl={ebirdUrl}
-                  labels={refLabels}
-                  compact
-                />
+                <div className="flex items-center justify-end gap-1.5">
+                  <SpeciesReferenceLinks
+                    wikipediaUrl={wikipediaUrl}
+                    ebirdUrl={ebirdUrl}
+                    labels={refLabels}
+                    compact
+                  />
+                  {hasAudio ? (
+                    <AtlasAudioControl
+                      audioUrl={species.audio?.url}
+                      available
+                      labels={audioLabels}
+                      showTooltip={false}
+                      className="postcard-action-pill size-7 min-h-7 justify-center px-0 text-ink-2 hover:bg-background hover:text-ink [&_svg]:size-3.5"
+                    />
+                  ) : null}
+                </div>
               }
               compact={inModal}
             />
           </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-col gap-2">
-          <header className="postcard-panel postcard-identity-panel flex flex-col gap-1.5 px-5 py-4 sm:px-6 sm:py-5">
-            <h1 className="font-heading text-3xl leading-tight tracking-tight text-ink md:text-[34px]">
+        <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
+          <header className="postcard-panel postcard-identity-panel flex flex-col justify-between gap-2.5 px-5 py-4">
+            <h1 className="font-heading text-[26px] leading-[1.15] font-normal tracking-tight text-ink sm:text-[30px]">
               {stack.primary}
             </h1>
-            {stack.secondary.length > 0 ? (
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-base text-ink-2">
-                {stack.secondary.map((name) => (
-                  <p key={name}>{name}</p>
-                ))}
-              </div>
-            ) : null}
-            <p className="pt-0.5 font-mono text-[11px] tracking-[0.06em] text-ink-soft italic">
-              {stack.scientific}
-            </p>
+            <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[13px] leading-snug text-ink-2">
+              {stack.secondary.map((name) => (
+                <span key={name}>{name}</span>
+              ))}
+              <span className="font-mono text-[11px] tracking-[0.03em] text-ink-soft italic">
+                {stack.scientific}
+              </span>
+            </div>
           </header>
 
-          {hasText(spottingTips) ? (
-            <section className="postcard-panel flex flex-col gap-3 px-5 py-4 sm:px-6 sm:py-5">
-              <h2 className="editorial-section-heading">{t("spottingTips")}</h2>
-              <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-ink-2">
-                {spottingTips}
-              </p>
-            </section>
-          ) : null}
-
-          {hasText(description) ? (
-            <section className="postcard-panel flex flex-col gap-3 px-5 py-4 sm:px-6 sm:py-5">
-              <h2 className="editorial-section-heading">{t("about")}</h2>
-              <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-ink-2">
-                {description}
-              </p>
-            </section>
-          ) : null}
-
-          <SpeciesVoicePlayer slug={species.slug} audio={species.audio} />
-
-          <section className="postcard-panel postcard-tail-panel flex flex-col gap-3 px-5 py-4 sm:px-6 sm:py-5">
-            <h2 className="editorial-section-heading">{t("prevalence")}</h2>
-            <PrevalenceChart prevalence={species.prevalence} />
-
-            {!hasArt ? (
-              <div className="flex justify-start pt-2">
-                <SpeciesReferenceLinks
-                  wikipediaUrl={wikipediaUrl}
-                  ebirdUrl={ebirdUrl}
-                  labels={refLabels}
-                />
-              </div>
+          <section className="postcard-panel postcard-tail-panel flex flex-1 flex-col gap-3 px-5 py-4">
+            {hasCopy ? (
+              <>
+                <h2 className="font-heading text-[19px] leading-snug font-normal tracking-tight text-ink sm:text-[21px]">
+                  {t("about")}
+                </h2>
+                <div className="flex flex-col gap-2.5 text-[13.5px] leading-[1.6] text-ink-2 sm:text-[14px]">
+                  {hasText(description) ? (
+                    <p className="whitespace-pre-wrap">{description}</p>
+                  ) : null}
+                  {hasText(spottingTips) ? (
+                    <p className="whitespace-pre-wrap">{spottingTips}</p>
+                  ) : null}
+                </div>
+              </>
             ) : null}
+
+            <div className={cn("mt-auto", hasCopy && "pt-3")}>
+              <PrevalenceChart prevalence={species.prevalence} />
+
+              {!hasArt && (wikipediaUrl || ebirdUrl || hasAudio) ? (
+                <div className="flex items-center justify-start gap-1.5 pt-3">
+                  <SpeciesReferenceLinks
+                    wikipediaUrl={wikipediaUrl}
+                    ebirdUrl={ebirdUrl}
+                    labels={refLabels}
+                  />
+                  {hasAudio ? (
+                    <AtlasAudioControl
+                      audioUrl={species.audio?.url}
+                      available
+                      labels={audioLabels}
+                      showTooltip={false}
+                      className="postcard-action-pill size-7 min-h-7 justify-center px-0 text-ink-2 hover:bg-background hover:text-ink [&_svg]:size-3.5"
+                    />
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
           </section>
         </div>
       </div>
-
-      {!inModal ? (
-        <div className="flex justify-start">
-          <SeasonLink pathname="/" backLabel={tNav("backToCollage")} />
-        </div>
-      ) : null}
     </div>
   );
 }

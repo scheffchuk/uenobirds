@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -9,6 +10,8 @@ import {
   LocaleChromeBar,
   LocaleChromeBarFallback,
 } from "@/components/site/LocaleChromeBar";
+import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
+import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { loadMessages } from "@/i18n/load-messages";
@@ -83,30 +86,28 @@ async function AtlasSpeciesBody({
 function AtlasDetailSkeleton() {
   return (
     <div
-      className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-x-14 lg:gap-y-8"
+      className="postcard-sheet mx-auto grid w-full max-w-[820px] grid-cols-1 gap-1.5 p-1.5 sm:gap-2 sm:p-2 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
       aria-hidden
     >
-      <div className="flex flex-col gap-1 lg:col-span-full">
-        <div className="h-9 w-2/3 rounded-lg bg-paper-2 md:h-10" />
-        <div className="h-7 w-1/3 rounded-md bg-paper-2" />
-        <div className="h-7 w-1/3 rounded-md bg-paper-2" />
-        <div className="h-5 w-1/4 rounded-md bg-paper-2" />
-      </div>
-      <div className="flex flex-col items-center gap-3">
-        <div className="aspect-square w-full max-w-60 rounded-xl bg-paper-2 sm:max-w-80 lg:max-w-100" />
-        <div className="h-8 w-36 rounded-lg bg-paper-2" />
-      </div>
-      <div className="flex flex-col gap-8">
-        {[0, 1].map((section) => (
-          <div key={section} className="flex flex-col gap-4">
-            <div className="h-7 w-32 rounded-md bg-paper-2" />
-            <div className="flex flex-col gap-3">
-              {[0, 1, 2, 3].map((line) => (
-                <div key={line} className="h-4 rounded-md bg-paper-2" />
-              ))}
-            </div>
+      <div className="postcard-visual-panel min-h-64 sm:min-h-72 md:min-h-[440px]" />
+      <div className="flex flex-col gap-1.5 sm:gap-2">
+        <div className="postcard-panel postcard-identity-panel flex h-24 flex-col justify-between p-5">
+          <div className="h-7 w-2/3 rounded-md bg-paper-2" />
+          <div className="h-4 w-1/2 rounded-md bg-paper-2" />
+        </div>
+        <div className="postcard-panel postcard-tail-panel flex min-h-64 flex-1 flex-col gap-3 p-5">
+          <div className="h-6 w-24 rounded-md bg-paper-2" />
+          <div className="flex flex-col gap-2">
+            <div className="h-3.5 w-full rounded bg-paper-2" />
+            <div className="h-3.5 w-11/12 rounded bg-paper-2" />
+            <div className="h-3.5 w-4/5 rounded bg-paper-2" />
           </div>
-        ))}
+          <div className="mt-auto grid grid-cols-4 gap-3 border-t border-hairline/70 pt-3">
+            {[0, 1, 2, 3].map((col) => (
+              <div key={col} className="h-5 rounded bg-paper-2" />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -118,15 +119,20 @@ export default function AtlasSpeciesPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <article className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-6 pt-4 pb-10 md:px-8 md:pt-5">
-      <AnimatedSuspense
-        fallback={<LocaleChromeBarFallback showTrailing={false} />}
-      >
-        <AtlasSpeciesChrome />
-      </AnimatedSuspense>
-      <AnimatedSuspense fallback={<AtlasDetailSkeleton />}>
-        <AtlasSpeciesBody params={params} />
-      </AnimatedSuspense>
-    </article>
+    <>
+      <article className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-6 pt-4 pb-4 md:px-8 md:pt-5">
+        <AnimatedSuspense
+          fallback={<LocaleChromeBarFallback showTrailing={false} />}
+        >
+          <AtlasSpeciesChrome />
+        </AnimatedSuspense>
+        <AnimatedSuspense fallback={<AtlasDetailSkeleton />}>
+          <AtlasSpeciesBody params={params} />
+        </AnimatedSuspense>
+      </article>
+      <Suspense fallback={<SiteFooterFallback />}>
+        <LocaleSiteFooter />
+      </Suspense>
+    </>
   );
 }

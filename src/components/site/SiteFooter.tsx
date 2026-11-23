@@ -2,13 +2,27 @@ import { loadMessages } from "@/i18n/load-messages";
 import type { AppLocale } from "@/i18n/routing";
 import { SITE_FOOTER } from "@/lib/site/attribution";
 
+export type FooterClearance = "none" | "switcher";
+
+function footerPadding(clearance: FooterClearance) {
+  return clearance === "switcher"
+    ? "mt-auto px-6 pt-4 pb-20 md:px-10 md:pt-3 md:pb-22"
+    : "mt-auto px-6 py-5 md:px-10 md:py-6";
+}
+
 /** Footer copy from the cached message catalog (per Locale). */
-export async function SiteFooter({ locale }: { locale: AppLocale }) {
+export async function SiteFooter({
+  locale,
+  clearance = "none",
+}: {
+  locale: AppLocale;
+  clearance?: FooterClearance;
+}) {
   const messages = await loadMessages(locale);
   const t = messages.Footer;
 
   return (
-    <footer className="mt-auto px-6 pt-4 pb-20 md:px-10 md:pt-3 md:pb-22">
+    <footer className={footerPadding(clearance)}>
       <div className="mx-auto max-w-3xl text-center">
         <p className="font-mono text-[10px] tracking-[0.18em] text-ink-soft uppercase">
           {t.credit}{" "}
@@ -52,8 +66,10 @@ export async function SiteFooter({ locale }: { locale: AppLocale }) {
   );
 }
 
-export function SiteFooterFallback() {
-  return (
-    <footer className="mt-auto px-6 pt-4 pb-20 md:px-10 md:pt-3 md:pb-22" aria-hidden />
-  );
+export function SiteFooterFallback({
+  clearance = "none",
+}: {
+  clearance?: FooterClearance;
+} = {}) {
+  return <footer className={footerPadding(clearance)} aria-hidden />;
 }

@@ -67,7 +67,7 @@ describe("PostcardModal", () => {
     trigger.remove();
   });
 
-  it("closes when clicking the backdrop or close button", () => {
+  it("closes when clicking the backdrop and omits a floating close button", () => {
     const onClose = vi.fn();
     const container = renderModal(onClose);
 
@@ -81,11 +81,8 @@ describe("PostcardModal", () => {
 
     const closeBtn = container.querySelector<HTMLButtonElement>(
       'button[aria-label="Close species postcard"]',
-    )!;
-    act(() => {
-      closeBtn.click();
-    });
-    expect(onClose).toHaveBeenCalledTimes(2);
+    );
+    expect(closeBtn).toBeNull();
   });
 
   it("dismisses when dragged past threshold and ignores click after a cancelled short drag", () => {

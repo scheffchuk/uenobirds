@@ -47,9 +47,9 @@ export function CompactScrollHeader({
     <header
       data-compact={compact ? "true" : "false"}
       className={cn(
-        "compact-scroll-header sticky top-0 z-20 -mx-4 px-4 text-center transition-[padding,background-color,box-shadow] duration-300 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8",
+        "compact-scroll-header sticky top-0 z-20 flex w-full flex-col items-center justify-center px-16 text-center transition-[padding,background-color,box-shadow] duration-300 sm:px-24",
         compact
-          ? "bg-background/88 py-3 shadow-[0_1px_0_rgba(26,22,18,0.09)] backdrop-blur-md"
+          ? "min-h-[66px] bg-background/88 py-3 shadow-[0_1px_0_rgba(26,22,18,0.09)] backdrop-blur-md md:min-h-[74px]"
           : "bg-transparent pt-10 pb-2 md:pt-8",
       )}
     >
@@ -70,10 +70,10 @@ export function CompactScrollHeader({
       </div>
       <h1
         className={cn(
-          "font-heading leading-none text-ink transition-[font-size,letter-spacing] duration-300",
+          "font-heading text-ink transition-[font-size,letter-spacing] duration-300",
           compact
-            ? "text-base tracking-[0.14em] uppercase md:text-lg"
-            : "text-[clamp(24px,3vw,36px)] tracking-tight",
+            ? "text-base leading-tight tracking-[0.14em] uppercase md:text-lg"
+            : "text-[clamp(24px,3vw,36px)] leading-none tracking-tight",
         )}
       >
         {title}

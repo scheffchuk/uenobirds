@@ -16,8 +16,26 @@ test("opens species postcard modal from Atlas list, closes cleanly, and renders 
     dialog.getByRole("heading", { name: "Winter Demo Bird", level: 1 }),
   ).toBeVisible();
   await expect(
-    dialog.getByRole("slider", { name: "Seek bird voice recording" }),
+    dialog.getByRole("heading", { name: "About", level: 2 }),
   ).toBeVisible();
+  await expect(
+    dialog.getByText("A hardy winter demo visitor at Shinobazu Pond."),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("Look near the northern reeds on crisp winter mornings."),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("heading", { name: "Spotting tips" }),
+  ).toHaveCount(0);
+  await expect(
+    dialog.getByRole("slider", { name: "Seek bird voice recording" }),
+  ).toHaveCount(0);
+  await expect(
+    dialog.getByRole("button", { name: "Play audio" }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Close species postcard" }),
+  ).toHaveCount(0);
 
   // Pressing Escape closes the modal and returns to the Atlas list with ?season=all intact
   await page.keyboard.press("Escape");

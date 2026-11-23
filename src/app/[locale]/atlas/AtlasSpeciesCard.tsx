@@ -20,7 +20,6 @@ export function AtlasSpeciesCard({
   comName,
   sciName,
   imageUrl,
-  prevalence,
   index,
   season,
   audio,
@@ -30,7 +29,6 @@ export function AtlasSpeciesCard({
   comName: string;
   sciName: string;
   imageUrl?: string;
-  prevalence?: number;
   index: number;
   season: SeasonFilter;
   audio?: PublicAudio;
@@ -51,14 +49,6 @@ export function AtlasSpeciesCard({
       >
         <div className="w-24 shrink-0 pl-2 sm:w-auto sm:p-0">
           <div className="edo-plate-well relative aspect-square w-full overflow-hidden">
-            {prevalence !== undefined ? (
-              <span
-                aria-hidden="true"
-                className="edo-hanko-seal pointer-events-none absolute top-2 right-2 z-10 hidden sm:inline-flex"
-              >
-                {prevalence}
-              </span>
-            ) : null}
             {imageUrl ? (
               <SpeciesArtTransition slug={slug}>
                 <Image
@@ -79,7 +69,7 @@ export function AtlasSpeciesCard({
             )}
           </div>
         </div>
-        <CardHeader className="min-w-0 flex-1 gap-0.5 px-0 py-1.5 sm:px-2.5 sm:pt-3 sm:pb-1">
+        <CardHeader className="min-w-0 flex-1 gap-0.5 px-0 py-1.5 sm:flex sm:flex-col sm:justify-center sm:py-2 sm:pr-11 sm:pl-2.5">
           <CardTitle className="atlas-card-title line-clamp-2 font-heading text-base leading-snug underline-offset-4 decoration-hairline">
             {comName}
           </CardTitle>
@@ -88,7 +78,7 @@ export function AtlasSpeciesCard({
           </CardDescription>
         </CardHeader>
       </HoverPrefetchLink>
-      <div className="absolute right-2 flex size-10 items-center justify-center sm:static sm:mt-auto sm:flex sm:w-full sm:items-center sm:justify-end sm:border-t sm:border-hairline/70 sm:px-2.5 sm:pt-1.5 sm:pb-0.5">
+      <div className="absolute top-1/2 right-2 flex size-10 -translate-y-1/2 items-center justify-center sm:top-auto sm:right-2 sm:bottom-2.5 sm:translate-y-0">
         <AtlasAudioControl
           slug={slug}
           audioUrl={audio?.url}

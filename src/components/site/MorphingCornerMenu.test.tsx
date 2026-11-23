@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRoot, type Root } from "react-dom/client";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../../messages/en.json";
-import { resetCollageLabelsPreference } from "@/lib/collage/label-preference";
 import { MorphingCornerMenu } from "./MorphingCornerMenu";
 
 const replaceSpy = vi.fn();
@@ -42,7 +41,6 @@ afterEach(() => {
   }
   roots = [];
   replaceSpy.mockReset();
-  resetCollageLabelsPreference();
 });
 
 function renderMenu() {
@@ -63,7 +61,7 @@ function renderMenu() {
 }
 
 describe("MorphingCornerMenu", () => {
-  it("morphs open on click, closes on Escape, and toggles collage label preference", () => {
+  it("morphs open on click and closes on Escape", () => {
     const container = renderMenu();
     const shell = container.querySelector(".corner-menu-shell")!;
     const trigger = container.querySelector<HTMLButtonElement>(
@@ -78,13 +76,7 @@ describe("MorphingCornerMenu", () => {
     });
     expect(shell.getAttribute("data-open")).toBe("true");
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
-
-    const toggle = container.querySelector<HTMLButtonElement>('[role="switch"]')!;
-    expect(toggle.getAttribute("aria-checked")).toBe("true");
-    act(() => {
-      toggle.click();
-    });
-    expect(toggle.getAttribute("aria-checked")).toBe("false");
+    expect(container.querySelector('[role="switch"]')).toBeNull();
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));

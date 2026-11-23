@@ -70,10 +70,7 @@
     "emptyTitle": "No illustrations for this season yet",
     "emptyDescription": "Check back soon, or explore the full list in the Atlas.",
     "browseAtlas": "Browse the Atlas",
-    "hint": "Choose a bird to explore. Larger birds are seen more often.",
-    "labelsToggle": "Bird names",
-    "showLabels": "Show bird names on collage",
-    "hideLabels": "Hide bird names on collage"
+    "hint": "Choose a bird to explore. Larger birds are seen more often."
   },
   "Season": {
     "winter": "Winter",

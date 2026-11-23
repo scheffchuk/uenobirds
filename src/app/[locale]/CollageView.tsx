@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  useId,
   useMemo,
   useRef,
   useState,
@@ -13,11 +12,6 @@ import {
 } from "react";
 import { hrefWithSeason } from "@/lib/season/url";
 import { hitTestCollageTiles } from "@/lib/collage/mask";
-import type {
-  CollageLabelInkTier,
-  CollageLabelPath,
-} from "@/lib/collage/label-path";
-import { useCollageLabelsVisible } from "@/lib/collage/label-preference";
 import type { CollageArt, SeasonTile } from "@/lib/collage/types";
 import type { SeasonFilter } from "@/lib/season/types";
 import { commonNameForLocale } from "@/lib/locale/species";
@@ -34,17 +28,7 @@ import { SpeciesArtTransition } from "@/components/site/species-art-transition";
 import type { AppLocale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
-const COLLAGE_IMAGE_SIZES = "(max-width: 767px) 30vw, 12vw";
-
-const INK_FILTER_TIERS: {
-  tier: CollageLabelInkTier;
-  baseFrequency: number;
-  scale: number;
-}[] = [
-  { tier: "subtle", baseFrequency: 0.5, scale: 0.4 },
-  { tier: "medium", baseFrequency: 0.48, scale: 0.65 },
-  { tier: "strong", baseFrequency: 0.45, scale: 0.9 },
-];
+const COLLAGE_IMAGE_SIZES = "(max-width: 767px) 30vw, 14vw";
 
 function lcpSlug(tiles: SeasonTile[]): string | undefined {
   return [...tiles]
@@ -53,59 +37,6 @@ function lcpSlug(tiles: SeasonTile[]): string | undefined {
       (a, b) =>
         a.portrait.y - b.portrait.y || a.portrait.x - b.portrait.x,
     )[0]?.slug;
-}
-
-function CurvedTileLabel({
-  idPrefix,
-  slug,
-  orientation,
-  label,
-  text,
-  locale,
-  active,
-  className,
-}: {
-  idPrefix: string;
-  slug: string;
-  orientation: "portrait" | "landscape";
-  label: CollageLabelPath;
-  text: string;
-  locale: AppLocale;
-  active: boolean;
-  className: string;
-}) {
-  const pathId = `${idPrefix}-${orientation}-${slug}`;
-  const isLatin = locale === "en";
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox={`0 0 ${label.vbW} ${label.vbH}`}
-      preserveAspectRatio="xMidYMid meet"
-      className={cn(
-        "collage-label pointer-events-none absolute inset-0 size-full overflow-visible transition-opacity duration-200",
-        active ? "collage-label-active" : undefined,
-        className,
-      )}
-    >
-      <defs>
-        <path id={pathId} d={label.d} fill="none" />
-      </defs>
-      <text
-        data-ink={label.ink}
-        className={cn(
-          "collage-label-text font-heading",
-          isLatin && "italic",
-        )}
-        style={{
-          fontSize: `${label.fontSize}px`,
-        }}
-      >
-        <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
-          {text}
-        </textPath>
-      </text>
-    </svg>
-  );
 }
 
 export function CollageView({
@@ -119,9 +50,7 @@ export function CollageView({
 }) {
   const t = useTranslations("Collage");
   const locale = useLocale() as AppLocale;
-  const idPrefix = useId();
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-  const [labelsVisible] = useCollageLabelsVisible();
   const stageRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
   const decodedCacheRef = useRef(new Map<string, Uint8Array>());
@@ -184,41 +113,6 @@ export function CollageView({
       className="group collage-frame"
       onPointerLeave={() => setHoveredSlug(null)}
     >
-      {/* Subtle ink-on-paper SVG filters shared across curved silhouette labels */}
-      <svg
-        className="pointer-events-none absolute size-0 overflow-hidden"
-        aria-hidden="true"
-      >
-        <defs>
-          {INK_FILTER_TIERS.map(({ tier, baseFrequency, scale }) => (
-            <filter
-              key={tier}
-              id={`collage-ink-${tier}`}
-              x="-6%"
-              y="-16%"
-              width="112%"
-              height="132%"
-              colorInterpolationFilters="sRGB"
-            >
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency={baseFrequency}
-                numOctaves={2}
-                seed={17}
-                result="tooth"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="tooth"
-                scale={scale}
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-          ))}
-        </defs>
-      </svg>
-
       {tiles.length === 0 ? (
         <Empty className="absolute inset-0 border-0">
           <EmptyHeader>
@@ -301,30 +195,6 @@ export function CollageView({
                     fetchPriority={priority ? "high" : "auto"}
                   />
                 </SpeciesArtTransition>
-                {labelsVisible && tile.label?.portrait ? (
-                  <CurvedTileLabel
-                    idPrefix={idPrefix}
-                    slug={tile.slug}
-                    orientation="portrait"
-                    label={tile.label.portrait}
-                    text={name}
-                    locale={locale}
-                    active={isActive}
-                    className="md:hidden"
-                  />
-                ) : null}
-                {labelsVisible && tile.label?.landscape ? (
-                  <CurvedTileLabel
-                    idPrefix={idPrefix}
-                    slug={tile.slug}
-                    orientation="landscape"
-                    label={tile.label.landscape}
-                    text={name}
-                    locale={locale}
-                    active={isActive}
-                    className="hidden md:block"
-                  />
-                ) : null}
               </HoverPrefetchLink>
             );
           })}

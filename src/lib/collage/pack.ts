@@ -1,15 +1,55 @@
 import { decodeMaskBits, type SilhouetteMask } from "./mask";
 import type { CollageBird, PackedBird } from "./types";
 
-const COUNT_EXP = 0.55;
-const PACKING_BUDGET_FRAC = 0.55;
-const MASK_BUDGET_FRAC = 0.68;
-const MIN_TILE_AREA_FRAC = 0.012;
-const GAP = 8;
+const COUNT_EXP = 0.58;
+const PACKING_BUDGET_FRAC = 0.52;
+const MASK_BUDGET_FRAC = 0.54;
+const MIN_TILE_AREA_FRAC = 0.01;
+const GAP = 10;
 const CELL = 4;
-const PAD_CELLS = Math.max(1, Math.round(GAP / CELL));
 
 type SizedTile = CollageBird & { width: number; height: number };
+
+function ellipseBiases(
+  viewportW: number,
+  viewportH: number,
+): { xBias: number; yBias: number } {
+  if (viewportW >= viewportH) {
+    return {
+      xBias: Math.min(2.3, viewportW / Math.max(1, viewportH)),
+      yBias: 1,
+    };
+  }
+  return {
+    xBias: 1,
+    yBias: Math.min(1.7, viewportH / Math.max(1, viewportW)),
+  };
+}
+
+function centerPlaced(
+  placed: PackedBird[],
+  viewportW: number,
+  viewportH: number,
+): PackedBird[] {
+  if (placed.length === 0) return placed;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const tile of placed) {
+    if (tile.x < minX) minX = tile.x;
+    if (tile.x + tile.width > maxX) maxX = tile.x + tile.width;
+    if (tile.y < minY) minY = tile.y;
+    if (tile.y + tile.height > maxY) maxY = tile.y + tile.height;
+  }
+  const dx = (viewportW - (maxX - minX)) / 2 - minX;
+  const dy = (viewportH - (maxY - minY)) / 2 - minY;
+  return placed.map((tile) => ({
+    ...tile,
+    x: Math.max(0, Math.min(viewportW - tile.width, tile.x + dx)),
+    y: Math.max(0, Math.min(viewportH - tile.height, tile.y + dy)),
+  }));
+}
 
 function sizeTiles(birds: CollageBird[], viewportW: number, viewportH: number) {
   const vpArea = viewportW * viewportH;
@@ -69,16 +109,24 @@ function tryPlaceRects(
   const placed: PackedBird[] = [];
   const cx = viewportW / 2;
   const cy = viewportH / 2;
+  const { xBias, yBias } = ellipseBiases(viewportW, viewportH);
+
+  let seed = 0x9e3779b9 % 2147483647;
+  const rand = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
 
   for (const tile of tiles) {
     let found: { x: number; y: number } | null = null;
     const maxR = Math.hypot(viewportW, viewportH);
+    const phase = rand() * Math.PI * 2;
     for (let r = 0; r <= maxR && !found; r += 4) {
-      const steps = Math.max(8, Math.ceil((2 * Math.PI * r) / 8));
+      const steps = Math.max(12, Math.ceil((2 * Math.PI * r) / 8));
       for (let s = 0; s < steps; s += 1) {
-        const angle = (s / steps) * 2 * Math.PI;
-        const x = cx + Math.cos(angle) * r - tile.width / 2;
-        const y = cy + Math.sin(angle) * r - tile.height / 2;
+        const angle = phase + (s / steps) * 2 * Math.PI;
+        const x = cx + Math.cos(angle) * r * xBias - tile.width / 2;
+        const y = cy + Math.sin(angle) * r * yBias - tile.height / 2;
         if (
           x < 0 ||
           y < 0 ||
@@ -97,7 +145,7 @@ function tryPlaceRects(
     if (!found) return null;
     placed.push({ ...tile, x: found.x, y: found.y });
   }
-  return placed;
+  return centerPlaced(placed, viewportW, viewportH);
 }
 
 /**
@@ -163,7 +211,8 @@ function tryPlaceMasked(
 
   const cx = viewportW / 2;
   const cy = viewportH / 2;
-  const aspectRatio = viewportW / Math.max(1, viewportH);
+  const { xBias, yBias } = ellipseBiases(viewportW, viewportH);
+  const padCells = viewportW > viewportH ? 4 : 3;
 
   // Place largest / most prevalent silhouettes first near the center so smaller
   // birds naturally nest into concave wings, tails, and open pockets around them.
@@ -172,22 +221,51 @@ function tryPlaceMasked(
       b.width * b.height - a.width * a.height || a.slug.localeCompare(b.slug),
   );
 
+  // Deterministic PRNG keeps organic radial growth stable across builds.
+  let seed = 0x9e3779b9 % 2147483647;
+  const rand = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+
   for (const tile of ordered) {
     const { pts } = rasterizeTilePoints(tile, decodedMasks);
     const maxGx = Math.floor((viewportW - tile.width) / CELL);
     const maxGy = Math.floor((viewportH - tile.height) / CELL);
     if (maxGx < 0 || maxGy < 0) return null;
 
+    let comX = cx;
+    let comY = cy;
+    if (placed.length > 0) {
+      let sumX = 0;
+      let sumY = 0;
+      let sumW = 0;
+      for (const p of placed) {
+        const area = p.width * p.height;
+        sumX += (p.x + p.width / 2) * area;
+        sumY += (p.y + p.height / 2) * area;
+        sumW += area;
+      }
+      if (sumW > 0) {
+        comX = sumX / sumW;
+        comY = sumY / sumW;
+      }
+    }
+
     let foundGx = -1;
     let foundGy = -1;
-    const maxR = Math.hypot(viewportW, viewportH);
+    let bestCost = Infinity;
+    let foundRing = -1;
+    const maxR = Math.max(viewportW, viewportH);
+    const phase = rand() * Math.PI * 2;
 
-    for (let r = 0; r <= maxR && foundGx < 0; r += CELL) {
-      const steps = Math.max(12, Math.ceil((2 * Math.PI * r) / (CELL * 1.5)));
+    for (let r = 0; r <= maxR; r += CELL) {
+      if (foundRing >= 0 && r > foundRing + CELL * 2) break;
+      const steps = Math.max(24, Math.ceil((2 * Math.PI * r) / (CELL * 1.6)));
       for (let s = 0; s < steps; s += 1) {
-        const angle = (s / steps) * 2 * Math.PI;
-        const x = cx + Math.cos(angle) * r * Math.min(1.25, aspectRatio) - tile.width / 2;
-        const y = cy + Math.sin(angle) * r - tile.height / 2;
+        const angle = phase + (s / steps) * 2 * Math.PI;
+        const x = cx + Math.cos(angle) * r * xBias - tile.width / 2;
+        const y = cy + Math.sin(angle) * r * yBias - tile.height / 2;
         const gx = Math.round(x / CELL);
         const gy = Math.round(y / CELL);
         if (gx < 0 || gy < 0 || gx > maxGx || gy > maxGy) continue;
@@ -202,11 +280,17 @@ function tryPlaceMasked(
           }
         }
         if (!collides) {
-          foundGx = gx;
-          foundGy = gy;
-          break;
+          const dxx = gx * CELL + tile.width / 2 - comX;
+          const dyy = gy * CELL + tile.height / 2 - comY;
+          const cost = Math.hypot(dxx / xBias, dyy / yBias) + rand() * CELL * 0.5;
+          if (cost < bestCost) {
+            bestCost = cost;
+            foundGx = gx;
+            foundGy = gy;
+          }
         }
       }
+      if (foundGx >= 0 && foundRing < 0) foundRing = r;
     }
 
     if (foundGx < 0) return null;
@@ -215,10 +299,10 @@ function tryPlaceMasked(
     for (let i = 0; i < pts.length; i += 2) {
       const cxCell = foundGx + pts[i]!;
       const cyCell = foundGy + pts[i + 1]!;
-      const y0 = Math.max(0, cyCell - PAD_CELLS);
-      const y1 = Math.min(gridH - 1, cyCell + PAD_CELLS);
-      const x0 = Math.max(0, cxCell - PAD_CELLS);
-      const x1 = Math.min(gridW - 1, cxCell + PAD_CELLS);
+      const y0 = Math.max(0, cyCell - padCells);
+      const y1 = Math.min(gridH - 1, cyCell + padCells);
+      const x0 = Math.max(0, cxCell - padCells);
+      const x1 = Math.min(gridW - 1, cxCell + padCells);
       for (let py = y0; py <= y1; py += 1) {
         const row = py * gridW;
         for (let px = x0; px <= x1; px += 1) {
@@ -234,7 +318,7 @@ function tryPlaceMasked(
     });
   }
 
-  return placed;
+  return centerPlaced(placed, viewportW, viewportH);
 }
 
 /**

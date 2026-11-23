@@ -34,7 +34,7 @@ async function HomeChrome() {
   const copy = await homeChromeCopy(locale);
 
   return (
-    <header className="flex flex-col items-center gap-2 px-4 pt-14 pb-3 text-center md:pt-14">
+    <header className="flex flex-col items-center gap-2 px-4 pt-12 pb-2 text-center md:pt-10 md:pb-2">
       <h1 className="font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
         <FastLink href="/about" className="transition-colors hover:text-ink-2">
           {copy.title}
@@ -49,7 +49,7 @@ async function HomeChrome() {
 
 function HomeChromeFallback() {
   return (
-    <header className="flex flex-col items-center gap-2 px-4 pt-14 pb-3 text-center md:pt-14">
+    <header className="flex flex-col items-center gap-2 px-4 pt-12 pb-2 text-center md:pt-10 md:pb-2">
       <div className="h-[clamp(22px,2.8vw,34px)] w-56" aria-hidden />
       <div className="h-9 w-70 sm:h-4" aria-hidden />
     </header>
@@ -104,7 +104,7 @@ export default function HomePage({
         <HomeChrome />
       </AnimatedSuspense>
 
-      <div className="relative mx-auto flex min-h-[50vh] w-full max-w-325 flex-1 flex-col px-4 pb-2 md:px-8 md:pb-3">
+      <div className="relative mx-auto flex min-h-[50vh] w-full max-w-[1680px] flex-1 flex-col px-3 pb-16 md:px-6 md:pb-20">
         <AnimatedSuspense fallback={<CollageSkeleton />}>
           <CollageSection searchParams={searchParams} />
         </AnimatedSuspense>

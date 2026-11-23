@@ -31,14 +31,13 @@ async function ModalSpeciesBody({
 function ModalSkeleton() {
   return (
     <div
-      className="postcard-sheet grid grid-cols-1 gap-2 p-2 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)]"
+      className="postcard-sheet postcard-sheet-modal grid grid-cols-1 gap-1.5 p-1.5 sm:gap-2 sm:p-2 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
       aria-hidden
     >
-      <div className="postcard-visual-panel min-h-72 lg:min-h-112" />
-      <div className="flex flex-col gap-2">
-        <div className="postcard-panel h-28" />
-        <div className="postcard-panel h-36" />
-        <div className="postcard-panel h-44" />
+      <div className="postcard-visual-panel min-h-56 sm:min-h-64 md:min-h-[420px]" />
+      <div className="flex flex-col gap-1.5 sm:gap-2">
+        <div className="postcard-panel postcard-identity-panel h-24" />
+        <div className="postcard-panel postcard-tail-panel min-h-64 flex-1" />
       </div>
     </div>
   );

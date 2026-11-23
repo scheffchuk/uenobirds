@@ -85,7 +85,6 @@ export async function AtlasListView({
                     comName={displayName}
                     sciName={row.sciName}
                     imageUrl={row.imageUrl}
-                    prevalence={row.prevalence}
                     index={index}
                     season={season}
                     audio={row.audio}

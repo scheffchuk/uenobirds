@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { LocaleChromeBar, LocaleChromeBarFallback } from "@/components/site/LocaleChromeBar";
+import { LocaleSiteFooter } from "@/components/site/LocaleSiteFooter";
+import { SiteFooterFallback } from "@/components/site/SiteFooter";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { loadMessages } from "@/i18n/load-messages";
@@ -62,13 +65,18 @@ async function AboutBody() {
 
 export default function AboutPage() {
   return (
-    <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-6 py-12 md:px-8">
-      <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
-        <AboutChrome />
-      </AnimatedSuspense>
-      <AnimatedSuspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
-        <AboutBody />
-      </AnimatedSuspense>
-    </article>
+    <>
+      <article className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-12 px-6 py-12 md:px-8">
+        <AnimatedSuspense fallback={<LocaleChromeBarFallback showTrailing={false} />}>
+          <AboutChrome />
+        </AnimatedSuspense>
+        <AnimatedSuspense fallback={<div className="min-h-[40vh]" aria-hidden />}>
+          <AboutBody />
+        </AnimatedSuspense>
+      </article>
+      <Suspense fallback={<SiteFooterFallback />}>
+        <LocaleSiteFooter />
+      </Suspense>
+    </>
   );
 }

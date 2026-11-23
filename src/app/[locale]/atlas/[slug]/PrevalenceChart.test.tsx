@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 describe("PrevalenceChart", () => {
-  it("highlights the active Season bar and renders stippled values for all four seasons", () => {
+  it("highlights the active Season column and renders values for all four seasons", () => {
     const container = document.createElement("div");
     document.body.append(container);
     const root = createRoot(container);
@@ -39,7 +39,6 @@ describe("PrevalenceChart", () => {
     const summerCol = container.querySelector('[data-season="summer"]');
     expect(winterCol?.getAttribute("data-active-season")).toBe("true");
     expect(summerCol?.getAttribute("data-active-season")).toBeNull();
-    expect(winterCol?.querySelector(".stipple-bar-active")).not.toBeNull();
     expect(container.textContent).toContain("82");
     expect(container.textContent).toContain("35");
   });
