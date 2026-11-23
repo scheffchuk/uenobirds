@@ -6,9 +6,11 @@
   "Nav": {
     "atlas": "図鑑",
     "about": "このサイトについて",
-    "collage": "トップ",
+    "collage": "コラージュ",
+    "menu": "メニュー",
+    "viewSwitcher": "表示切替",
     "backToAtlas": "図鑑に戻る",
-    "backToCollage": "トップに戻る"
+    "backToCollage": "コラージュに戻る"
   },
   "Home": {
     "title": "上野で出会う鳥たち"

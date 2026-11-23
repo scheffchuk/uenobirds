@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AtlasListView } from "./AtlasListView";
-import { SeasonLink } from "@/components/season/SeasonLink";
+import { CompactScrollHeader } from "@/components/atlas/CompactScrollHeader";
 import { AnimatedSuspense } from "@/components/ui/animated-suspense";
 import { SeasonPickerSkeleton } from "@/components/season/SeasonPickerSkeleton";
 import { loadMessages } from "@/i18n/load-messages";
@@ -33,8 +33,8 @@ async function atlasChromeCopy(locale: AppLocale) {
   cacheLife("max");
   const messages = await loadMessages(locale);
   return {
+    eyebrow: messages.Meta.title,
     title: messages.Atlas.title,
-    backToCollage: messages.Nav.backToCollage,
   };
 }
 
@@ -42,18 +42,11 @@ async function AtlasChrome() {
   const locale = (await getLocale()) as AppLocale;
   const copy = await atlasChromeCopy(locale);
 
-  return (
-    <header className="grid grid-cols-[2rem_1fr_2rem] items-center gap-3">
-      <SeasonLink pathname="/" backLabel={copy.backToCollage} prefetch={true} />
-      <h1 className="text-center font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
-        {copy.title}
-      </h1>
-    </header>
-  );
+  return <CompactScrollHeader eyebrow={copy.eyebrow} title={copy.title} />;
 }
 
 function AtlasChromeFallback() {
-  return <div className="h-8" aria-hidden />;
+  return <div className="h-24" aria-hidden />;
 }
 
 async function AtlasListSection({
@@ -99,7 +92,7 @@ export default function AtlasPage({
   searchParams: Promise<SeasonSearch>;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-4 pt-4 pb-10 sm:px-6 md:px-8 md:pt-5">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 px-4 pt-2 pb-24 sm:px-6 md:px-8">
       <AnimatedSuspense fallback={<AtlasChromeFallback />}>
         <AtlasChrome />
       </AnimatedSuspense>

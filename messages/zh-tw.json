@@ -6,9 +6,11 @@
   "Nav": {
     "atlas": "圖鑑",
     "about": "關於本站",
-    "collage": "首頁",
+    "collage": "拼貼",
+    "menu": "選單",
+    "viewSwitcher": "切換檢視",
     "backToAtlas": "回到圖鑑",
-    "backToCollage": "回到首頁"
+    "backToCollage": "回到拼貼"
   },
   "Home": {
     "title": "在上野遇見的鳥"

@@ -6,9 +6,11 @@
   "Nav": {
     "atlas": "Atlas",
     "about": "About",
-    "collage": "Home",
+    "collage": "Collage",
+    "menu": "Menu",
+    "viewSwitcher": "Views",
     "backToAtlas": "Back to Atlas",
-    "backToCollage": "Back to home"
+    "backToCollage": "Back to collage"
   },
   "Home": {
     "title": "Birds you’ll meet in Ueno"
