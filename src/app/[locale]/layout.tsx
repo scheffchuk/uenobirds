@@ -29,8 +29,10 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal?: React.ReactNode;
 }) {
   const [localeRaw, messages] = await Promise.all([getLocale(), getMessages()]);
   const locale = localeRaw as AppLocale;
@@ -53,6 +55,7 @@ export default async function LocaleLayout({
             </Suspense>
           </div>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          {modal}
           <Suspense fallback={<SiteFooterFallback />}>
             <LocaleSiteFooter />
           </Suspense>

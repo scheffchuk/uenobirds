@@ -54,6 +54,9 @@
     "loop": "リピート",
     "loopAudio": "リピート再生を切り替え",
     "scrubAudio": "鳴き声の再生位置を移動",
+    "closeModal": "鳥のカードを閉じる",
+    "dragToClose": "下にスワイプまたはタップして閉じる",
+    "quickViewLabel": "鳥のポストカード",
     "notFound": "お探しの鳥が見つかりません"
   },
   "Collage": {

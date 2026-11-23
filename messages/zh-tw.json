@@ -54,6 +54,9 @@
     "loop": "循環",
     "loopAudio": "切換循環播放",
     "scrubAudio": "調整鳥鳴播放進度",
+    "closeModal": "關閉鳥類明信片",
+    "dragToClose": "向下拖曳或點擊以關閉",
+    "quickViewLabel": "鳥類明信片",
     "notFound": "找不到這隻鳥"
   },
   "Collage": {

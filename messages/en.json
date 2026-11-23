@@ -54,6 +54,9 @@
     "loop": "Loop",
     "loopAudio": "Toggle loop playback",
     "scrubAudio": "Seek bird voice recording",
+    "closeModal": "Close species postcard",
+    "dragToClose": "Drag down or press to close postcard",
+    "quickViewLabel": "Species postcard",
     "notFound": "Bird not found"
   },
   "Collage": {
