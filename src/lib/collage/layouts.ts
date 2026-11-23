@@ -1,6 +1,7 @@
 import { prevalenceForFilter } from "@/lib/guide/prevalence";
 import { SEASON_FILTERS } from "@/lib/season/url";
 import type { SeasonFilter } from "@/lib/season/types";
+import { buildLabelsForCanvas } from "./label-path";
 import { packCollage } from "./pack";
 import type {
   CollageArt,
@@ -92,6 +93,19 @@ function layoutForSeason(birds: CollageBird[]): SeasonLayout {
     return EMPTY_LAYOUT;
   }
 
+  const portraitLabels = buildLabelsForCanvas(
+    portrait,
+    COLLAGE_CANVAS.portrait.width,
+    COLLAGE_CANVAS.portrait.height,
+    "portrait",
+  );
+  const landscapeLabels = buildLabelsForCanvas(
+    landscape,
+    COLLAGE_CANVAS.landscape.width,
+    COLLAGE_CANVAS.landscape.height,
+    "landscape",
+  );
+
   const portraitBySlug = new Map(portrait.map((tile) => [tile.slug, tile]));
   const tiles: SeasonTile[] = [];
   for (const tile of landscape) {
@@ -102,10 +116,20 @@ function layoutForSeason(birds: CollageBird[]): SeasonLayout {
     if (!isFiniteRect(portraitRect) || !isFiniteRect(landscapeRect)) {
       return EMPTY_LAYOUT;
     }
+    const pLabel = portraitLabels.get(tile.slug);
+    const lLabel = landscapeLabels.get(tile.slug);
     tiles.push({
       slug: tile.slug,
       portrait: portraitRect,
       landscape: landscapeRect,
+      ...(pLabel || lLabel
+        ? {
+            label: {
+              ...(pLabel ? { portrait: pLabel } : {}),
+              ...(lLabel ? { landscape: lLabel } : {}),
+            },
+          }
+        : {}),
     });
   }
 

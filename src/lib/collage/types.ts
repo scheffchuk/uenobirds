@@ -1,6 +1,7 @@
 import type { SeasonFilter } from "@/lib/season/types";
 import type { SeasonalPrevalence } from "@/lib/guide/types";
 import type { SilhouetteMask } from "./mask";
+import type { CollageLabelPath } from "./label-path";
 
 /** Row from `listForCollage` — one cutout URL + aspect + optional silhouette mask. */
 export type CollageSpecies = {
@@ -39,6 +40,10 @@ export type SeasonTile = {
   slug: string;
   portrait: TileRect;
   landscape: TileRect;
+  label?: {
+    portrait?: CollageLabelPath;
+    landscape?: CollageLabelPath;
+  };
 };
 
 export type SeasonLayout = {

@@ -118,7 +118,7 @@
  */
 .collage-frame {
   position: absolute;
-  inset: 8px;
+  inset: 14px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,6 +157,34 @@
 .collage-tile.is-hover .collage-tile-img,
 .collage-tile:focus-visible .collage-tile-img {
   filter: drop-shadow(0 4px 12px rgba(26, 22, 18, 0.24)) saturate(1.08);
+}
+
+.collage-label-text {
+  fill: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  paint-order: stroke fill;
+  stroke: var(--background);
+  stroke-width: 2.2px;
+  stroke-linejoin: round;
+  transition: fill 150ms ease;
+}
+
+.collage-label-text[data-ink="s"] {
+  filter: url("#collage-ink-s");
+}
+
+.collage-label-text[data-ink="m"] {
+  filter: url("#collage-ink-m");
+}
+
+.collage-label-text[data-ink="l"] {
+  filter: url("#collage-ink-l");
+}
+
+.collage-label-active .collage-label-text,
+.collage-tile:focus-visible .collage-label-text {
+  fill: var(--ink);
 }
 
 @media (min-width: 768px) {

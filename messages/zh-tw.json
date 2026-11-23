@@ -57,7 +57,10 @@
     "emptyTitle": "這個季節的插畫還在準備中",
     "emptyDescription": "過陣子再來看看，或先逛逛圖鑑吧。",
     "browseAtlas": "瀏覽圖鑑",
-    "hint": "點選鳥兒認識牠。越常遇見的鳥，插畫就越大。"
+    "hint": "點選鳥兒認識牠。越常遇見的鳥，插畫就越大。",
+    "labelsToggle": "鳥類名稱",
+    "showLabels": "在拼貼上顯示鳥名",
+    "hideLabels": "隱藏拼貼上的鳥名"
   },
   "Season": {
     "winter": "冬天",
