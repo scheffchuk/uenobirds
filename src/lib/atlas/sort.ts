@@ -1,5 +1,4 @@
 import type { AppLocale } from "@/i18n/routing";
-import type { SeasonalPrevalence } from "@/lib/guide/types";
 
 export type AtlasSortKey = "prevalence" | "alpha" | "peak";
 
@@ -10,17 +9,8 @@ export type SortableAtlasItem = {
   peakPrevalence: number;
 };
 
-export function peakPrevalenceOf(prevalence: SeasonalPrevalence): number {
-  return Math.max(
-    prevalence.winter,
-    prevalence.spring,
-    prevalence.summer,
-    prevalence.autumn,
-  );
-}
-
 /**
- * Deterministic sort for Atlas list items across all three Locales.
+ * Deterministic sort for Atlas list items across EN, JA, and ZH-TW Locales.
  */
 export function sortAtlasItems<T extends SortableAtlasItem>(
   items: readonly T[],

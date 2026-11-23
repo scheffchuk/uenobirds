@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { TypeIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   useId,
@@ -14,7 +13,10 @@ import {
 } from "react";
 import { hrefWithSeason } from "@/lib/season/url";
 import { hitTestCollageTiles } from "@/lib/collage/mask";
-import type { CollageLabelPath } from "@/lib/collage/label-path";
+import type {
+  CollageLabelInkTier,
+  CollageLabelPath,
+} from "@/lib/collage/label-path";
 import { useCollageLabelsVisible } from "@/lib/collage/label-preference";
 import type { CollageArt, SeasonTile } from "@/lib/collage/types";
 import type { SeasonFilter } from "@/lib/season/types";
@@ -34,6 +36,16 @@ import { cn } from "@/lib/utils";
 
 const COLLAGE_IMAGE_SIZES = "(max-width: 767px) 30vw, 12vw";
 
+const INK_FILTER_TIERS: {
+  tier: CollageLabelInkTier;
+  baseFrequency: number;
+  scale: number;
+}[] = [
+  { tier: "subtle", baseFrequency: 0.5, scale: 0.4 },
+  { tier: "medium", baseFrequency: 0.48, scale: 0.65 },
+  { tier: "strong", baseFrequency: 0.45, scale: 0.9 },
+];
+
 function lcpSlug(tiles: SeasonTile[]): string | undefined {
   return [...tiles]
     .filter((tile) => tile.portrait.y < 30)
@@ -46,7 +58,7 @@ function lcpSlug(tiles: SeasonTile[]): string | undefined {
 function CurvedTileLabel({
   idPrefix,
   slug,
-  variant,
+  orientation,
   label,
   text,
   locale,
@@ -55,14 +67,14 @@ function CurvedTileLabel({
 }: {
   idPrefix: string;
   slug: string;
-  variant: "p" | "l";
+  orientation: "portrait" | "landscape";
   label: CollageLabelPath;
   text: string;
   locale: AppLocale;
   active: boolean;
   className: string;
 }) {
-  const pathId = `${idPrefix}-${variant}-${slug}`;
+  const pathId = `${idPrefix}-${orientation}-${slug}`;
   const isLatin = locale === "en";
   return (
     <svg
@@ -109,7 +121,7 @@ export function CollageView({
   const locale = useLocale() as AppLocale;
   const idPrefix = useId();
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-  const [labelsVisible, setLabelsVisible] = useCollageLabelsVisible();
+  const [labelsVisible] = useCollageLabelsVisible();
   const stageRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
   const decodedCacheRef = useRef(new Map<string, Uint8Array>());
@@ -178,75 +190,32 @@ export function CollageView({
         aria-hidden="true"
       >
         <defs>
-          <filter
-            id="collage-ink-s"
-            x="-6%"
-            y="-16%"
-            width="112%"
-            height="132%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.5"
-              numOctaves={2}
-              seed={17}
-              result="tooth"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="tooth"
-              scale={0.4}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-          <filter
-            id="collage-ink-m"
-            x="-6%"
-            y="-16%"
-            width="112%"
-            height="132%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.48"
-              numOctaves={2}
-              seed={17}
-              result="tooth"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="tooth"
-              scale={0.65}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-          <filter
-            id="collage-ink-l"
-            x="-6%"
-            y="-16%"
-            width="112%"
-            height="132%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.45"
-              numOctaves={2}
-              seed={17}
-              result="tooth"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="tooth"
-              scale={0.9}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
+          {INK_FILTER_TIERS.map(({ tier, baseFrequency, scale }) => (
+            <filter
+              key={tier}
+              id={`collage-ink-${tier}`}
+              x="-6%"
+              y="-16%"
+              width="112%"
+              height="132%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency={baseFrequency}
+                numOctaves={2}
+                seed={17}
+                result="tooth"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="tooth"
+                scale={scale}
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+          ))}
         </defs>
       </svg>
 
@@ -336,7 +305,7 @@ export function CollageView({
                   <CurvedTileLabel
                     idPrefix={idPrefix}
                     slug={tile.slug}
-                    variant="p"
+                    orientation="portrait"
                     label={tile.label.portrait}
                     text={name}
                     locale={locale}
@@ -348,7 +317,7 @@ export function CollageView({
                   <CurvedTileLabel
                     idPrefix={idPrefix}
                     slug={tile.slug}
-                    variant="l"
+                    orientation="landscape"
                     label={tile.label.landscape}
                     text={name}
                     locale={locale}
@@ -361,24 +330,6 @@ export function CollageView({
           })}
         </div>
       )}
-
-      {tiles.length > 0 ? (
-        <button
-          type="button"
-          onClick={() => setLabelsVisible(!labelsVisible)}
-          aria-pressed={labelsVisible}
-          aria-label={labelsVisible ? t("hideLabels") : t("showLabels")}
-          title={labelsVisible ? t("hideLabels") : t("showLabels")}
-          className={cn(
-            "absolute right-2 bottom-2 z-20 inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 font-mono text-[9.5px] tracking-[0.12em] uppercase transition-all",
-            "bg-paper-2/90 text-ink-soft shadow-(--recess) hover:text-ink active:scale-95",
-            labelsVisible && "bg-background text-ink shadow-(--raised)",
-          )}
-        >
-          <TypeIcon aria-hidden className="size-3" />
-          <span className="hidden sm:inline">{t("labelsToggle")}</span>
-        </button>
-      ) : null}
 
       <div
         className="pointer-events-none absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-background px-3.5 py-1.5 font-heading text-[13px] tracking-wide text-ink-2 italic shadow-[0_2px_8px_rgba(26,22,18,0.06)] transition-opacity duration-150"

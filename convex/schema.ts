@@ -6,6 +6,7 @@ import {
   speciesEbirdValidator,
   speciesWikipediaValidator,
 } from "./lib/audio";
+import { maskValidator } from "./lib/maskValidator";
 
 export default defineSchema({
   ...authTables,
@@ -29,12 +30,8 @@ export default defineSchema({
     spottingTipsZhTw: v.optional(v.string()),
     illustrationPerch: v.optional(v.id("_storage")),
     illustrationFlight: v.optional(v.id("_storage")),
-    maskPerch: v.optional(
-      v.object({ w: v.number(), h: v.number(), bits: v.string() }),
-    ),
-    maskFlight: v.optional(
-      v.object({ w: v.number(), h: v.number(), bits: v.string() }),
-    ),
+    maskPerch: v.optional(maskValidator),
+    maskFlight: v.optional(maskValidator),
     dimsPerch: v.optional(v.array(v.number())),
     dimsFlight: v.optional(v.array(v.number())),
     illustrationStatus: v.union(

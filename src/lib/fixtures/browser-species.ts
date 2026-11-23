@@ -1,10 +1,7 @@
-import { notFound } from "next/navigation";
-import { AtlasListView } from "../AtlasListView";
-import type { AtlasListSource } from "@/lib/atlas/select";
-import { requireSeasonParam, type SeasonSearch } from "@/lib/season/require-param";
-import { AnimatedSuspense } from "@/components/ui/animated-suspense";
+import type { SpeciesRecord } from "@/lib/guide/types";
 
-const browserFixtureSpecies: AtlasListSource[] = [
+/** Dev/Playwright-only fixture species for offline browser tests. */
+export const BROWSER_FIXTURE_SPECIES: SpeciesRecord[] = [
   {
     slug: "winter-demo-bird",
     sciName: "Demo avis hiemalis",
@@ -12,14 +9,20 @@ const browserFixtureSpecies: AtlasListSource[] = [
     comNameJa: "冬のテスト鳥",
     comNameZhTw: "冬季測試鳥",
     listed: true,
+    illustrationStatus: "approved",
     prevalence: { winter: 100, spring: 40, summer: 0, autumn: 20 },
+    descriptionEn: "A hardy winter demo visitor at Shinobazu Pond.",
+    spottingTipsEn: "Look near the northern reeds on crisp winter mornings.",
     audio: {
       status: "available",
       url: "https://audio.test/winter-demo-bird.mp3",
+      durationSeconds: 18,
+      soundType: "call",
+      recordist: "Fixture Recordist",
     },
     wikipedia: {
       en: "https://wikipedia.test/wiki/Winter_Demo_Bird",
-      ja: "https://wikipedia.test/ja/wiki/Winter_Demo_Bird",
+      ja: "https://wikipedia.test/ja/Winter_Demo_Bird",
       zhTw: "https://wikipedia.test/zh-tw/Winter_Demo_Bird",
     },
     ebird: {
@@ -34,14 +37,20 @@ const browserFixtureSpecies: AtlasListSource[] = [
     comNameJa: "夏のテスト鳥",
     comNameZhTw: "夏季測試鳥",
     listed: true,
+    illustrationStatus: "approved",
     prevalence: { winter: 0, spring: 30, summer: 90, autumn: 10 },
+    descriptionEn: "A lively summer demo visitor across Ueno canopy paths.",
+    spottingTipsEn: "Listen in the tall zelkova trees after sunrise.",
     audio: {
       status: "available",
       url: "https://audio.test/summer-demo-bird.mp3",
+      durationSeconds: 14,
+      soundType: "song",
+      recordist: "Fixture Recordist",
     },
     wikipedia: {
       en: "https://wikipedia.test/wiki/Summer_Demo_Bird",
-      ja: "https://wikipedia.test/ja/wiki/Summer_Demo_Bird",
+      ja: "https://wikipedia.test/ja/Summer_Demo_Bird",
       zhTw: "https://wikipedia.test/zh-tw/Summer_Demo_Bird",
     },
     ebird: {
@@ -56,7 +65,9 @@ const browserFixtureSpecies: AtlasListSource[] = [
     comNameJa: "音声なしテスト鳥",
     comNameZhTw: "無聲測試鳥",
     listed: true,
+    illustrationStatus: "approved",
     prevalence: { winter: 35, spring: 0, summer: 0, autumn: 0 },
+    descriptionEn: "A quiet fixture species with no audio recording.",
     audio: {
       status: "unavailable",
       unavailableReason: "Fixture has no recording",
@@ -64,32 +75,7 @@ const browserFixtureSpecies: AtlasListSource[] = [
   },
 ];
 
-async function FixtureList({
-  searchParams,
-}: {
-  searchParams: Promise<SeasonSearch>;
-}) {
-  const params = await searchParams;
-  const season = await requireSeasonParam(params, "/atlas/test-fixture");
-  return <AtlasListView species={browserFixtureSpecies} season={season} pickerPath="/atlas/test-fixture" />;
-}
-
-/** Dev-only fixture for the Playwright Atlas interaction tests. */
-export default function AtlasBrowserFixturePage({
-  searchParams,
-}: {
-  searchParams: Promise<SeasonSearch>;
-}) {
-  if (process.env.BROWSER_TEST_FIXTURES !== "1") notFound();
-
-  return (
-    <main className="min-h-0 flex-1 bg-background px-6 py-10 text-foreground">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-        <h1 className="font-heading text-2xl text-ink">Atlas browser fixture</h1>
-        <AnimatedSuspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
-          <FixtureList searchParams={searchParams} />
-        </AnimatedSuspense>
-      </div>
-    </main>
-  );
+export function findBrowserFixtureSpecies(slug: string): SpeciesRecord | null {
+  if (process.env.BROWSER_TEST_FIXTURES !== "1") return null;
+  return BROWSER_FIXTURE_SPECIES.find((sp) => sp.slug === slug) ?? null;
 }

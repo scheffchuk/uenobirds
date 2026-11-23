@@ -24,7 +24,6 @@ async function homeChromeCopy(locale: AppLocale) {
   cacheLife("max");
   const messages = await loadMessages(locale);
   return {
-    eyebrow: messages.Meta.title,
     title: messages.Home.title,
     hint: messages.Collage.hint,
   };
@@ -35,17 +34,13 @@ async function HomeChrome() {
   const copy = await homeChromeCopy(locale);
 
   return (
-    <header className="flex flex-col items-center gap-1.5 px-4 pt-14 pb-3 text-center md:pt-12">
-      <FastLink
-        href="/about"
-        className="font-heading text-sm tracking-wide text-ink-2 italic transition-colors hover:text-ink hover:underline underline-offset-4"
-      >
-        {copy.eyebrow}
-      </FastLink>
+    <header className="flex flex-col items-center gap-2 px-4 pt-14 pb-3 text-center md:pt-14">
       <h1 className="font-heading text-[clamp(22px,2.8vw,34px)] leading-none tracking-tight text-ink">
-        {copy.title}
+        <FastLink href="/about" className="transition-colors hover:text-ink-2">
+          {copy.title}
+        </FastLink>
       </h1>
-      <p className="max-w-80 pt-0.5 text-xs leading-relaxed text-ink-soft sm:max-w-none">
+      <p className="max-w-80 text-xs leading-relaxed text-ink-soft sm:max-w-none">
         {copy.hint}
       </p>
     </header>
@@ -54,8 +49,7 @@ async function HomeChrome() {
 
 function HomeChromeFallback() {
   return (
-    <header className="flex flex-col items-center gap-1.5 px-4 pt-14 pb-3 text-center md:pt-12">
-      <div className="h-5 w-28" aria-hidden />
+    <header className="flex flex-col items-center gap-2 px-4 pt-14 pb-3 text-center md:pt-14">
       <div className="h-[clamp(22px,2.8vw,34px)] w-56" aria-hidden />
       <div className="h-9 w-70 sm:h-4" aria-hidden />
     </header>

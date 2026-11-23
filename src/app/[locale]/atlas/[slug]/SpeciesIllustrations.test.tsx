@@ -6,6 +6,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../../../../messages/en.json";
 import { SpeciesIllustrations } from "./SpeciesIllustrations";
+import { SpeciesReferenceLinks } from "./SpeciesReferenceLinks";
 
 vi.mock("@/components/site/species-art-transition", () => ({
   SpeciesArtTransition: ({ children }: { children: React.ReactNode }) =>
@@ -32,7 +33,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function renderPlate(props: Partial<React.ComponentProps<typeof SpeciesIllustrations>> = {}) {
+function renderPlate() {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
@@ -48,9 +49,20 @@ function renderPlate(props: Partial<React.ComponentProps<typeof SpeciesIllustrat
             flightUrl: "https://images.example/pintail-flight.png",
           }}
           name="Northern Pintail"
-          wikipediaUrl="https://en.wikipedia.org/wiki/Northern_pintail"
-          ebirdUrl="https://ebird.org/species/norpin"
-          {...props}
+          footerEnd={
+            <SpeciesReferenceLinks
+              wikipediaUrl="https://en.wikipedia.org/wiki/Northern_pintail"
+              ebirdUrl="https://ebird.org/species/norpin"
+              compact
+              labels={{
+                wikipedia: "Wikipedia",
+                ebird: "eBird",
+                viewOnWikipedia: "View on Wikipedia",
+                viewOnEbird: "View on eBird",
+                opensNewTab: "opens in a new tab",
+              }}
+            />
+          }
         />
       </NextIntlClientProvider>,
     );

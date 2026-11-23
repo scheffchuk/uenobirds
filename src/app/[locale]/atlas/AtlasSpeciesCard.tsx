@@ -88,17 +88,7 @@ export function AtlasSpeciesCard({
           </CardDescription>
         </CardHeader>
       </HoverPrefetchLink>
-      <div className="absolute right-2 flex size-10 items-center justify-center sm:static sm:mt-auto sm:flex sm:w-full sm:items-center sm:justify-between sm:border-t sm:border-hairline/70 sm:px-2.5 sm:pt-1.5 sm:pb-0.5">
-        {prevalence !== undefined ? (
-          <span
-            aria-hidden="true"
-            className="hidden font-mono text-[9.5px] tracking-[0.14em] text-ink-soft uppercase tabular-nums sm:inline"
-          >
-            № {String(index + 1).padStart(2, "0")}
-          </span>
-        ) : (
-          <span className="hidden sm:inline" aria-hidden="true" />
-        )}
+      <div className="absolute right-2 flex size-10 items-center justify-center sm:static sm:mt-auto sm:flex sm:w-full sm:items-center sm:justify-end sm:border-t sm:border-hairline/70 sm:px-2.5 sm:pt-1.5 sm:pb-0.5">
         <AtlasAudioControl
           slug={slug}
           audioUrl={audio?.url}

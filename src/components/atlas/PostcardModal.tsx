@@ -1,7 +1,7 @@
 "use client";
 
 import { XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -11,9 +11,15 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { stripLocalePrefix } from "@/lib/season/canonicalize";
 import { cn } from "@/lib/utils";
 
 const DISMISS_THRESHOLD_PX = 110;
+const DRAG_MOVE_THRESHOLD_PX = 8;
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function PostcardModal({
   children,
@@ -24,11 +30,18 @@ export function PostcardModal({
   onClose?: () => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("AtlasDetail");
   const dialogRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
+  const draggedRef = useRef(false);
   const [dragY, setDragY] = useState(0);
   const [dragging, setDragging] = useState(false);
+
+  // If the visitor soft-navigates to another top-level route (e.g. /about) while
+  // the parallel @modal slot stays mounted, hide the modal cleanly.
+  const strippedPath = pathname ? stripLocalePrefix(pathname) : "";
+  const isSpeciesDetailPath = !pathname || strippedPath.startsWith("/atlas/");
 
   const dismiss = useCallback(() => {
     if (onClose) {
@@ -39,6 +52,11 @@ export function PostcardModal({
   }, [onClose, router]);
 
   useEffect(() => {
+    if (!isSpeciesDetailPath) return;
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     dialogRef.current?.focus();
@@ -47,17 +65,45 @@ export function PostcardModal({
       if (event.key === "Escape") {
         event.preventDefault();
         dismiss();
+        return;
+      }
+      if (event.key === "Tab" && dialogRef.current) {
+        const focusables = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+        ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+        if (focusables.length === 0) {
+          event.preventDefault();
+          dialogRef.current.focus();
+          return;
+        }
+        const first = focusables[0]!;
+        const last = focusables[focusables.length - 1]!;
+        if (event.shiftKey) {
+          if (
+            document.activeElement === first ||
+            document.activeElement === dialogRef.current
+          ) {
+            event.preventDefault();
+            last.focus();
+          }
+        } else if (document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus?.();
     };
-  }, [dismiss]);
+  }, [dismiss, isSpeciesDetailPath]);
 
   const handleDragStart = (event: PointerEvent<HTMLButtonElement>) => {
     dragStartY.current = event.clientY;
+    draggedRef.current = false;
     setDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
@@ -65,6 +111,9 @@ export function PostcardModal({
   const handleDragMove = (event: PointerEvent<HTMLButtonElement>) => {
     if (dragStartY.current === null) return;
     const delta = Math.max(0, event.clientY - dragStartY.current);
+    if (delta > DRAG_MOVE_THRESHOLD_PX) {
+      draggedRef.current = true;
+    }
     setDragY(delta);
   };
 
@@ -84,6 +133,8 @@ export function PostcardModal({
       setDragY(0);
     }
   };
+
+  if (!isSpeciesDetailPath) return null;
 
   return (
     <div
@@ -105,11 +156,7 @@ export function PostcardModal({
           "postcard-modal-frame relative z-10 flex max-h-[calc(100dvh-12px)] w-full max-w-[940px] flex-col overflow-hidden rounded-t-2xl outline-none md:max-h-[min(88dvh,760px)] md:rounded-[4px]",
           dragging && "transition-none",
         )}
-        style={
-          dragY > 0
-            ? { transform: `translateY(${dragY}px)` }
-            : undefined
-        }
+        style={dragY > 0 ? { transform: `translateY(${dragY}px)` } : undefined}
       >
         {/* Mobile drag-to-dismiss handle */}
         <button
@@ -120,7 +167,11 @@ export function PostcardModal({
           onPointerUp={handleDragEnd}
           onPointerCancel={handleDragEnd}
           onClick={() => {
-            if (dragY === 0) dismiss();
+            if (draggedRef.current) {
+              draggedRef.current = false;
+              return;
+            }
+            dismiss();
           }}
           className="flex h-8 w-full shrink-0 cursor-grab touch-none items-center justify-center bg-(--card-stock) active:cursor-grabbing md:hidden"
         >
@@ -131,14 +182,16 @@ export function PostcardModal({
         </button>
 
         {/* Close button */}
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={dismiss}
           aria-label={t("closeModal")}
-          className="absolute top-2.5 right-2.5 z-30 inline-flex size-8 items-center justify-center rounded-full bg-background/95 text-ink-soft shadow-(--raised) transition-colors hover:text-ink active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-ring/60 md:top-3.5 md:right-3.5"
+          className="absolute top-2.5 right-2.5 z-30 size-8 rounded-full bg-background/95 text-ink-soft shadow-(--raised) hover:bg-background hover:text-ink active:scale-95 md:top-3.5 md:right-3.5"
         >
           <XIcon aria-hidden className="size-4" />
-        </button>
+        </Button>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-(--card-stock) p-1.5 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:p-0">
           {children}

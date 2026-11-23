@@ -71,7 +71,7 @@ describe("SpeciesVoicePlayer", () => {
     ).toBe("");
   });
 
-  it("loads lazily on play, toggles pause/loop, and scrubs via keyboard", async () => {
+  it("loads lazily on play, toggles pause/loop, and scrubs via pointer drag and keyboard", async () => {
     const container = renderPlayer({
       status: "available",
       url: "https://audio.example/crow.mp3",
@@ -109,15 +109,42 @@ describe("SpeciesVoicePlayer", () => {
     expect(loopBtn.getAttribute("aria-pressed")).toBe("true");
     expect(audio.loop).toBe(true);
 
-    // Keyboard scrub forward
+    // Pointer drag scrubbing across the waveform strip
     const slider = container.querySelector<HTMLDivElement>('[role="slider"]')!;
+    vi.spyOn(slider, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      right: 200,
+      bottom: 64,
+      width: 200,
+      height: 64,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    act(() => {
+      slider.dispatchEvent(
+        new MouseEvent("pointerdown", { clientX: 50, bubbles: true }),
+      );
+      slider.dispatchEvent(
+        new MouseEvent("pointermove", { clientX: 100, bubbles: true }),
+      );
+      slider.dispatchEvent(
+        new MouseEvent("pointerup", { clientX: 100, bubbles: true }),
+      );
+    });
+    expect(Number(slider.getAttribute("aria-valuenow"))).toBe(50);
+    expect(container.textContent).toContain("0:10 / 0:20");
+
+    // Keyboard scrub forward by +5%
     act(() => {
       slider.dispatchEvent(
         new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
       );
     });
-    expect(Number(slider.getAttribute("aria-valuenow"))).toBe(5);
-    expect(container.textContent).toContain("0:01 / 0:20");
+    expect(Number(slider.getAttribute("aria-valuenow"))).toBe(55);
+    expect(container.textContent).toContain("0:11 / 0:20");
   });
 
   it("surfaces retry state on playback error", async () => {

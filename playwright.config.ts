@@ -21,7 +21,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `pnpm dev --hostname 127.0.0.1 --port ${port}`,
-    url: `http://127.0.0.1:${port}/en/atlas/test-fixture?season=all`,
+    url: `http://127.0.0.1:${port}/en/test-fixture?season=all`,
     reuseExistingServer: false,
     timeout: 120_000,
     env: {

@@ -78,7 +78,7 @@ test.beforeEach(async ({ page }) => {
       .context()
       .route(service, (route) => route.abort("blockedbyclient"));
   }
-  await page.goto("/en/atlas/test-fixture?season=all");
+  await page.goto("/en/test-fixture?season=all", { waitUntil: "networkidle" });
   await expect(
     page.getByRole("heading", { name: "Atlas browser fixture" }),
   ).toBeVisible();

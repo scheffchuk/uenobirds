@@ -11,6 +11,7 @@ const backSpy = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ back: backSpy }),
+  usePathname: () => "/en/atlas/anas-acuta",
 }));
 
 let roots: Array<{ root: Root; container: HTMLDivElement }> = [];
@@ -44,7 +45,11 @@ function renderModal(onClose?: () => void) {
 }
 
 describe("PostcardModal", () => {
-  it("renders accessible dialog semantics and closes on Escape", () => {
+  it("renders accessible dialog semantics, closes on Escape, and restores prior focus", () => {
+    const trigger = document.createElement("button");
+    document.body.append(trigger);
+    trigger.focus();
+
     const container = renderModal();
     const dialog = container.querySelector('[role="dialog"]');
     expect(dialog?.getAttribute("aria-modal")).toBe("true");
@@ -53,8 +58,13 @@ describe("PostcardModal", () => {
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     });
-
     expect(backSpy).toHaveBeenCalledTimes(1);
+
+    const entry = roots.pop()!;
+    act(() => entry.root.unmount());
+    entry.container.remove();
+    expect(document.activeElement).toBe(trigger);
+    trigger.remove();
   });
 
   it("closes when clicking the backdrop or close button", () => {
@@ -78,13 +88,29 @@ describe("PostcardModal", () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it("dismisses when dragged down past the threshold on mobile", () => {
+  it("dismisses when dragged past threshold and ignores click after a cancelled short drag", () => {
     const onClose = vi.fn();
     const container = renderModal(onClose);
     const handle = container.querySelector<HTMLButtonElement>(
       'button[aria-label="Drag down or press to close postcard"]',
     )!;
 
+    // Short drag < 110px followed by synthetic click should NOT dismiss
+    act(() => {
+      handle.dispatchEvent(
+        new MouseEvent("pointerdown", { clientY: 100, bubbles: true }),
+      );
+      handle.dispatchEvent(
+        new MouseEvent("pointermove", { clientY: 140, bubbles: true }),
+      );
+      handle.dispatchEvent(
+        new MouseEvent("pointerup", { clientY: 140, bubbles: true }),
+      );
+      handle.click();
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Long drag >= 110px dismisses cleanly
     act(() => {
       handle.dispatchEvent(
         new MouseEvent("pointerdown", { clientY: 100, bubbles: true }),
@@ -96,7 +122,6 @@ describe("PostcardModal", () => {
         new MouseEvent("pointerup", { clientY: 240, bubbles: true }),
       );
     });
-
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

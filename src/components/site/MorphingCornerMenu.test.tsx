@@ -54,9 +54,7 @@ function renderMenu() {
   act(() => {
     root.render(
       <NextIntlClientProvider locale="en" messages={en}>
-        <MorphingCornerMenu
-          copy={{ menu: "Menu", about: "About", audioCredits: "Audio credits" }}
-        />
+        <MorphingCornerMenu copy={{ menu: "Menu", about: "About" }} />
       </NextIntlClientProvider>,
     );
   });

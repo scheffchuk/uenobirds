@@ -1,6 +1,6 @@
 import { decodeMaskBits, type SilhouetteMask } from "./mask";
 
-export type CollageLabelInk = "s" | "m" | "l";
+export type CollageLabelInkTier = "subtle" | "medium" | "strong";
 
 export type CollageLabelPath = {
   /** Proportional tile-local viewBox dimensions (width = 100, height = 100 / aspect). */
@@ -11,7 +11,7 @@ export type CollageLabelPath = {
   /** Font size in viewBox units. */
   fontSize: number;
   /** Ink-bleed filter tier matching tile prominence. */
-  ink: CollageLabelInk;
+  ink: CollageLabelInkTier;
 };
 
 type LabelCandidateInput = {
@@ -24,9 +24,10 @@ type LabelCandidateInput = {
   mask?: SilhouetteMask;
 };
 
-const MIN_LANDSCAPE_AREA_FRAC = 0.018;
-const MIN_PORTRAIT_AREA_FRAC = 0.022;
-const MIN_TILE_WIDTH_PX = 66;
+const MIN_LANDSCAPE_AREA_FRAC = 0.006;
+const MIN_PORTRAIT_AREA_FRAC = 0.007;
+const MIN_RELATIVE_AREA_FRAC = 0.6;
+const MIN_TILE_WIDTH_PX = 56;
 const MAX_LABELS_LANDSCAPE = 16;
 const MAX_LABELS_PORTRAIT = 10;
 
@@ -68,8 +69,8 @@ export function buildSilhouetteLabelPath(
   const vbW = 100;
   const vbH = Math.max(25, round1((tile.height / tile.width) * 100));
   const areaFrac = (tile.width * tile.height) / Math.max(1, canvasW * canvasH);
-  const ink: CollageLabelInk =
-    areaFrac >= 0.06 ? "l" : areaFrac >= 0.03 ? "m" : "s";
+  const ink: CollageLabelInkTier =
+    tile.width >= 100 ? "strong" : tile.width >= 76 ? "medium" : "subtle";
   const fontSize = round1(
     Math.max(8.5, Math.min(14.5, 11.5 * Math.sqrt(Math.max(0.55, areaFrac / 0.045)))),
   );
@@ -201,14 +202,23 @@ export function buildLabelsForCanvas(
     mode === "landscape" ? MAX_LABELS_LANDSCAPE : MAX_LABELS_PORTRAIT;
   const canvasArea = Math.max(1, canvasW * canvasH);
 
-  const ranked = [...tiles]
-    .map((tile) => ({
-      tile,
-      areaFrac: (tile.width * tile.height) / canvasArea,
-    }))
+  const scored = tiles.map((tile) => ({
+    tile,
+    areaFrac: (tile.width * tile.height) / canvasArea,
+  }));
+  const maxAreaFrac = scored.reduce(
+    (max, entry) => Math.max(max, entry.areaFrac),
+    0,
+  );
+  const effectiveMinArea = Math.max(
+    minAreaFrac,
+    maxAreaFrac * MIN_RELATIVE_AREA_FRAC,
+  );
+
+  const ranked = scored
     .filter(
       ({ tile, areaFrac }) =>
-        areaFrac >= minAreaFrac && tile.width >= MIN_TILE_WIDTH_PX,
+        areaFrac >= effectiveMinArea && tile.width >= MIN_TILE_WIDTH_PX,
     )
     .sort(
       (a, b) =>

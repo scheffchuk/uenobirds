@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownAZIcon, BarChart3Icon, CalendarRangeIcon } from "lucide-react";
-import { useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +13,17 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   sortAtlasItems,
   type AtlasSortKey,
   type SortableAtlasItem,
 } from "@/lib/atlas/sort";
+import { useSlidingPill } from "@/lib/ui/use-sliding-pill";
 import type { AppLocale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
@@ -41,25 +48,7 @@ export function AtlasSearch({ items }: { items: AtlasSearchItem[] }) {
   const sortTrackRef = useRef<HTMLDivElement>(null);
   const sortPillRef = useRef<HTMLSpanElement>(null);
 
-  useLayoutEffect(() => {
-    const track = sortTrackRef.current;
-    const pill = sortPillRef.current;
-    if (!track || !pill) return;
-
-    const sync = () => {
-      const current = track.querySelector<HTMLElement>(
-        'button[aria-pressed="true"]',
-      );
-      if (!current) return;
-      pill.style.width = `${current.offsetWidth}px`;
-      pill.style.transform = `translateX(${current.offsetLeft}px)`;
-    };
-
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(track);
-    return () => ro.disconnect();
-  }, [sortBy]);
+  useSlidingPill(sortTrackRef, sortPillRef, 'button[aria-pressed="true"]', sortBy);
 
   const matches = useMemo(() => {
     const terms = query
@@ -95,53 +84,60 @@ export function AtlasSearch({ items }: { items: AtlasSearchItem[] }) {
         />
 
         <div className="flex items-center justify-between gap-3 sm:justify-end">
-          <p role="status" className="font-mono text-[11px] text-ink-soft tabular-nums">
+          <p
+            role="status"
+            className="font-mono text-[11px] text-ink-soft tabular-nums"
+          >
             {t("results", { count: matches.length })}
           </p>
 
-          <div
-            ref={sortTrackRef}
-            role="group"
-            aria-label={t("sortLabel")}
-            className="relative inline-flex items-center rounded-full bg-paper-2 p-[3px] shadow-(--recess)"
-          >
-            <span
-              ref={sortPillRef}
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-[3px] left-0 z-0 rounded-full bg-background shadow-(--raised) transition-[transform,width] duration-300 ease-[cubic-bezier(0.7,0.05,0.2,1)]"
-            />
-            {SORT_OPTIONS.map((option) => {
-              const active = sortBy === option.key;
-              const label = t(option.labelKey);
-              return (
-                <button
-                  key={option.key}
-                  type="button"
-                  aria-label={label}
-                  aria-pressed={active}
-                  onClick={() => setSortBy(option.key)}
-                  className={cn(
-                    "group/sort relative z-10 inline-flex h-7 w-8 items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-                    active ? "text-ink" : "text-ink-soft hover:text-ink",
-                  )}
-                >
-                  {option.key === "prevalence" ? (
-                    <BarChart3Icon aria-hidden className="size-3.5" />
-                  ) : option.key === "alpha" ? (
-                    <ArrowDownAZIcon aria-hidden className="size-3.5" />
-                  ) : (
-                    <CalendarRangeIcon aria-hidden className="size-3.5" />
-                  )}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-[calc(100%+6px)] left-1/2 z-30 -translate-x-1/2 rounded bg-background px-2 py-0.5 font-mono text-[9px] tracking-[0.12em] whitespace-nowrap text-ink-soft uppercase opacity-0 shadow-(--raised) transition-opacity duration-150 group-hover/sort:opacity-100 group-focus-visible/sort:opacity-100"
-                  >
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <TooltipProvider>
+            <div
+              ref={sortTrackRef}
+              role="group"
+              aria-label={t("sortLabel")}
+              className="relative inline-flex items-center rounded-full bg-paper-2 p-[3px] shadow-(--recess)"
+            >
+              <span
+                ref={sortPillRef}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-[3px] left-0 z-0 rounded-full bg-background shadow-(--raised) transition-[transform,width] duration-300 ease-[cubic-bezier(0.7,0.05,0.2,1)]"
+              />
+              {SORT_OPTIONS.map((option) => {
+                const active = sortBy === option.key;
+                const label = t(option.labelKey);
+                return (
+                  <Tooltip key={option.key}>
+                    <TooltipTrigger
+                      render={
+                        <button
+                          type="button"
+                          aria-label={label}
+                          aria-pressed={active}
+                          onClick={() => setSortBy(option.key)}
+                          className={cn(
+                            "relative z-10 inline-flex h-7 w-8 items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+                            active
+                              ? "text-ink"
+                              : "text-ink-soft hover:text-ink",
+                          )}
+                        />
+                      }
+                    >
+                      {option.key === "prevalence" ? (
+                        <BarChart3Icon aria-hidden className="size-3.5" />
+                      ) : option.key === "alpha" ? (
+                        <ArrowDownAZIcon aria-hidden className="size-3.5" />
+                      ) : (
+                        <CalendarRangeIcon aria-hidden className="size-3.5" />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{label}</TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
         </div>
       </div>
 

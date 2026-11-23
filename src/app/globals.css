@@ -176,16 +176,16 @@
   transition: fill 150ms ease;
 }
 
-.collage-label-text[data-ink="s"] {
-  filter: url("#collage-ink-s");
+.collage-label-text[data-ink="subtle"] {
+  filter: url("#collage-ink-subtle");
 }
 
-.collage-label-text[data-ink="m"] {
-  filter: url("#collage-ink-m");
+.collage-label-text[data-ink="medium"] {
+  filter: url("#collage-ink-medium");
 }
 
-.collage-label-text[data-ink="l"] {
-  filter: url("#collage-ink-l");
+.collage-label-text[data-ink="strong"] {
+  filter: url("#collage-ink-strong");
 }
 
 .collage-label-active .collage-label-text,

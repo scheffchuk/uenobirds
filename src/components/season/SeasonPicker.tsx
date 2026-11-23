@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FastLink } from "@/components/ui/fast-link";
 import type { SeasonFilter } from "@/lib/season/types";
@@ -9,6 +9,7 @@ import {
   SEASON_FILTERS,
   type SeasonPickerPath,
 } from "@/lib/season/url";
+import { useSlidingPill } from "@/lib/ui/use-sliding-pill";
 import { cn } from "@/lib/utils";
 import {
   SeasonPickerLabel,
@@ -35,26 +36,7 @@ export function SeasonPicker({
   }
   const pending = pendingFor !== null && pendingFor !== value;
 
-  useLayoutEffect(() => {
-    const track = trackRef.current;
-    const pill = pillRef.current;
-    if (!track || !pill) return;
-
-    const sync = () => {
-      const active = track.querySelector<HTMLElement>("[data-pressed]");
-      if (!active) return;
-      pill.style.width = `${active.offsetWidth}px`;
-      pill.style.transform = `translateX(${active.offsetLeft}px)`;
-    };
-
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(track);
-    for (const link of track.querySelectorAll("a")) {
-      ro.observe(link);
-    }
-    return () => ro.disconnect();
-  }, [value]);
+  useSlidingPill(trackRef, pillRef, "[data-pressed]", value, "a");
 
   return (
     <nav

@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../convex/_generated/api";
 import { GUIDE_SPECIES_TAG, speciesCacheTag } from "./cache-tags";
+import { findBrowserFixtureSpecies } from "@/lib/fixtures/browser-species";
 
 /**
  * Cached Atlas detail payload for a Listed Guide species Slug.
@@ -11,5 +12,7 @@ export async function loadListedSpecies(slug: string) {
   "use cache";
   cacheLife("max");
   cacheTag(GUIDE_SPECIES_TAG, speciesCacheTag(slug));
+  const fixture = findBrowserFixtureSpecies(slug);
+  if (fixture) return fixture;
   return await fetchQuery(api.species.getSpecies, { slug });
 }

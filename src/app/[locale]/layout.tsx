@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { RootShell } from "@/components/site/RootShell";
 import { MorphingCornerMenu } from "@/components/site/MorphingCornerMenu";
 import { BottomViewSwitcher } from "@/components/site/BottomViewSwitcher";
@@ -32,20 +32,21 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   modal?: React.ReactNode;
 }) {
-  const [localeRaw, messages] = await Promise.all([getLocale(), getMessages()]);
+  const [localeRaw, messages, tNav] = await Promise.all([
+    getLocale(),
+    getMessages(),
+    getTranslations("Nav"),
+  ]);
   const locale = localeRaw as AppLocale;
-  const nav = (messages.Nav ?? {}) as Record<string, string>;
-  const footer = (messages.Footer ?? {}) as Record<string, string>;
 
   const menuCopy = {
-    menu: nav.menu ?? "Menu",
-    about: nav.about ?? "About",
-    audioCredits: footer.audioCredits ?? "Audio credits",
+    menu: tNav("menu"),
+    about: tNav("about"),
   };
   const switcherCopy = {
-    collage: nav.collage ?? "Collage",
-    atlas: nav.atlas ?? "Atlas",
-    ariaLabel: nav.viewSwitcher ?? "Views",
+    collage: tNav("collage"),
+    atlas: tNav("atlas"),
+    ariaLabel: tNav("viewSwitcher"),
   };
 
   return (

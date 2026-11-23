@@ -11,7 +11,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { selectForAtlas, type AtlasListSource } from "@/lib/atlas/select";
-import { peakPrevalenceOf } from "@/lib/atlas/sort";
+import { prevalenceForFilter } from "@/lib/guide/prevalence";
 import { commonNameForLocale } from "@/lib/locale/species";
 import type { SeasonFilter } from "@/lib/season/types";
 import type { AppLocale } from "@/i18n/routing";
@@ -33,7 +33,7 @@ export async function AtlasListView({
   const locale = localeRaw as AppLocale;
   const rows = selectForAtlas(species, season);
   const peakBySlug = new Map(
-    species.map((sp) => [sp.slug, peakPrevalenceOf(sp.prevalence)]),
+    species.map((sp) => [sp.slug, prevalenceForFilter(sp, "all")]),
   );
   const cardLabels = {
     play: t("playAudio"),

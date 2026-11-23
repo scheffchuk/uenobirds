@@ -21,6 +21,7 @@ import {
   speciesEbirdValidator,
   speciesWikipediaValidator,
 } from "./lib/audio";
+import { maskValidator } from "./lib/maskValidator";
 
 const prevalenceValidator = v.object({
   winter: v.number(),
@@ -78,12 +79,6 @@ const atlasListRecordValidator = v.object({
   audio: v.optional(publicAudioValidator),
   ebird: v.optional(speciesEbirdValidator),
   wikipedia: v.optional(speciesWikipediaValidator),
-});
-
-const maskValidator = v.object({
-  w: v.number(),
-  h: v.number(),
-  bits: v.string(),
 });
 
 const collageSpeciesValidator = v.object({

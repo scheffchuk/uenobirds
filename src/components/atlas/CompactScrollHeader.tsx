@@ -4,9 +4,13 @@ import { useEffect, useState } from "react";
 import { FastLink } from "@/components/ui/fast-link";
 import { cn } from "@/lib/utils";
 
+const COMPACT_ENTER_Y = 56;
+const COMPACT_EXIT_Y = 20;
+
 /**
  * Editorial Atlas heading that smoothly collapses its eyebrow and shrinks into
  * a single sticky frosted-glass bar as the visitor scrolls down.
+ * Uses scroll hysteresis so header height changes never oscillate.
  */
 export function CompactScrollHeader({
   eyebrow,
@@ -21,8 +25,12 @@ export function CompactScrollHeader({
     let raf = 0;
     const update = () => {
       raf = 0;
-      const next = window.scrollY > 40;
-      setCompact((prev) => (prev === next ? prev : next));
+      const y = window.scrollY;
+      setCompact((prev) => {
+        if (!prev && y > COMPACT_ENTER_Y) return true;
+        if (prev && y < COMPACT_EXIT_Y) return false;
+        return prev;
+      });
     };
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);

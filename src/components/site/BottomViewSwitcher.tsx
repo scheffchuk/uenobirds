@@ -1,9 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Suspense, useLayoutEffect, useRef } from "react";
+import { Suspense, useRef } from "react";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { stripLocalePrefix } from "@/lib/season/canonicalize";
+import { useSlidingPill } from "@/lib/ui/use-sliding-pill";
 import { cn } from "@/lib/utils";
 
 export type ViewSwitcherCopy = {
@@ -22,26 +23,13 @@ function ViewSwitcherLinks({
   const trackRef = useRef<HTMLElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
 
-  useLayoutEffect(() => {
-    const track = trackRef.current;
-    const pill = pillRef.current;
-    if (!track || !pill) return;
-
-    const sync = () => {
-      const current = track.querySelector<HTMLElement>('[aria-current="page"]');
-      if (!current) return;
-      pill.style.width = `${current.offsetWidth}px`;
-      pill.style.transform = `translateX(${current.offsetLeft}px)`;
-    };
-
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(track);
-    for (const link of track.querySelectorAll("a")) {
-      ro.observe(link);
-    }
-    return () => ro.disconnect();
-  }, [active, copy.collage, copy.atlas]);
+  useSlidingPill(
+    trackRef,
+    pillRef,
+    '[aria-current="page"]',
+    `${active}:${copy.collage}:${copy.atlas}`,
+    "a",
+  );
 
   return (
     <nav

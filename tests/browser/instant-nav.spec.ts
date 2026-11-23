@@ -29,7 +29,7 @@ test("Season pills on the Atlas fixture are instant navigations", async ({
   page,
   baseURL,
 }) => {
-  await page.goto("/en/atlas/test-fixture?season=all");
+  await page.goto("/en/test-fixture?season=all");
   await expect(page.getByText("Winter Demo Bird")).toBeVisible();
 
   await instant(

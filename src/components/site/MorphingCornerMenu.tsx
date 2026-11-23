@@ -18,12 +18,11 @@ function isAppLocale(value: string): value is AppLocale {
 export type CornerMenuCopy = {
   menu: string;
   about: string;
-  audioCredits: string;
 };
 
 /**
  * Top-right corner shell that morphs seamlessly from a pill trigger into a
- * rounded card containing Locale selection, Collage label toggle, and links.
+ * rounded card containing Locale selection, Collage label toggle, and About link.
  */
 export function MorphingCornerMenu({
   copy,
@@ -95,7 +94,7 @@ export function MorphingCornerMenu({
           id={menuId}
           aria-hidden={!open}
           role="menu"
-          aria-label={tLocale("label")}
+          aria-label={copy.menu}
           className="corner-menu-panel"
         >
           <div className="corner-menu-sheet flex flex-col gap-3.5">
@@ -162,7 +161,7 @@ export function MorphingCornerMenu({
               </button>
             </div>
 
-            {/* Secondary site links */}
+            {/* About link */}
             <nav className="flex flex-col gap-0.5 border-t border-hairline pt-2">
               <FastLink
                 href="/about"
@@ -171,14 +170,6 @@ export function MorphingCornerMenu({
                 className="rounded-md px-2 py-1.5 text-sm text-ink transition-colors hover:bg-paper-2"
               >
                 {copy.about}
-              </FastLink>
-              <FastLink
-                href="/audio"
-                tabIndex={open ? 0 : -1}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-2 py-1.5 text-sm text-ink transition-colors hover:bg-paper-2"
-              >
-                {copy.audioCredits}
               </FastLink>
             </nav>
           </div>

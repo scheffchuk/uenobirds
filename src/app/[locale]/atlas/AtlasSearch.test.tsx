@@ -55,7 +55,7 @@ const SAMPLE_ITEMS: AtlasSearchItem[] = [
 ];
 
 describe("AtlasSearch with sort pill", () => {
-  it("reorders cards when switching sort modes and preserves live search filtering", () => {
+  it("reorders cards when switching sort modes and composes with live search filtering", () => {
     const container = document.createElement("div");
     document.body.append(container);
     const root = createRoot(container);
@@ -103,5 +103,31 @@ describe("AtlasSearch with sort pill", () => {
       "Large-billed Crow",
       "Grey Heron",
     ]);
+
+    // Filter with search query while peak sort is active: matches both "Grey Heron" (a) and "Large-billed Crow" / "Northern Pintail"
+    const input = container.querySelector<HTMLInputElement>(
+      'input[type="search"]',
+    )!;
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )!.set!;
+    act(() => {
+      setter.call(input, "a");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(listTexts()).toEqual([
+      "Northern Pintail",
+      "Large-billed Crow",
+      "Grey Heron",
+    ]);
+
+    act(() => {
+      setter.call(input, "n");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    // Both Northern Pintail (peak 95) and Grey Heron (peak 60) match "n" in names; Large-billed Crow also has "macrorhynchos"
+    expect(listTexts()).toContain("Northern Pintail");
+    expect(listTexts()[0]).toBe("Northern Pintail");
   });
 });

@@ -72,4 +72,24 @@ describe("collage curved label path placement", () => {
     // Largest bird always receives a label
     expect(landscapeLabels.has("bird-0")).toBe(true);
   });
+
+  it("still labels prominent birds on a crowded 60-species season flock", () => {
+    const crowded = Array.from({ length: 60 }, (_, i) => ({
+      slug: `winter-${i}`,
+      x: (i % 10) * 95,
+      y: Math.floor(i / 10) * 85,
+      width: i < 20 ? 105 : 62,
+      height: i < 20 ? 62 : 42,
+    }));
+
+    const landscapeLabels = buildLabelsForCanvas(
+      crowded,
+      1000,
+      540,
+      "landscape",
+    );
+    const portraitLabels = buildLabelsForCanvas(crowded, 600, 1000, "portrait");
+    expect(landscapeLabels.size).toBe(16);
+    expect(portraitLabels.size).toBe(10);
+  });
 });

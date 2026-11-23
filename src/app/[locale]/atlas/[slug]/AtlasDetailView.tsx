@@ -1,9 +1,9 @@
-import { ExternalLinkIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { SpeciesRecord } from "@/lib/guide/types";
 import { longFormForLocale, nameStackForLocale } from "@/lib/locale/species";
 import { SeasonLink } from "@/components/season/SeasonLink";
 import { SpeciesIllustrations } from "./SpeciesIllustrations";
+import { SpeciesReferenceLinks } from "./SpeciesReferenceLinks";
 import { SpeciesVoicePlayer } from "./SpeciesVoicePlayer";
 import { PrevalenceChart } from "./PrevalenceChart";
 import type { AppLocale } from "@/i18n/routing";
@@ -23,14 +23,24 @@ export async function AtlasDetailView({
   locale: AppLocale;
   inModal?: boolean;
 }) {
-  const t = await getTranslations("AtlasDetail");
-  const tNav = await getTranslations("Nav");
+  const [t, tAtlas, tNav] = await Promise.all([
+    getTranslations("AtlasDetail"),
+    getTranslations("Atlas"),
+    getTranslations("Nav"),
+  ]);
   const stack = nameStackForLocale(species, locale);
   const description = longFormForLocale(species, "description", locale);
   const spottingTips = longFormForLocale(species, "spottingTips", locale);
   const hasArt = Boolean(species.perchUrl || species.flightUrl);
   const wikipediaUrl = wikipediaUrlForLocale(species.wikipedia, locale);
   const ebirdUrl = species.ebird?.url;
+  const refLabels = {
+    wikipedia: tAtlas("wikipedia"),
+    ebird: tAtlas("ebird"),
+    viewOnWikipedia: t("viewOnWikipedia"),
+    viewOnEbird: t("viewOnEbird"),
+    opensNewTab: tAtlas("opensNewTab"),
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-5">
@@ -53,8 +63,14 @@ export async function AtlasDetailView({
                 flightUrl: species.flightUrl,
               }}
               name={stack.primary}
-              wikipediaUrl={wikipediaUrl}
-              ebirdUrl={ebirdUrl}
+              footerEnd={
+                <SpeciesReferenceLinks
+                  wikipediaUrl={wikipediaUrl}
+                  ebirdUrl={ebirdUrl}
+                  labels={refLabels}
+                  compact
+                />
+              }
               compact={inModal}
             />
           </div>
@@ -101,30 +117,13 @@ export async function AtlasDetailView({
             <h2 className="editorial-section-heading">{t("prevalence")}</h2>
             <PrevalenceChart prevalence={species.prevalence} />
 
-            {!hasArt && (wikipediaUrl || ebirdUrl) ? (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {wikipediaUrl ? (
-                  <a
-                    href={wikipediaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="postcard-action-pill"
-                  >
-                    {t("viewOnWikipedia")}
-                    <ExternalLinkIcon aria-hidden className="size-3" />
-                  </a>
-                ) : null}
-                {ebirdUrl ? (
-                  <a
-                    href={ebirdUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="postcard-action-pill"
-                  >
-                    {t("viewOnEbird")}
-                    <ExternalLinkIcon aria-hidden className="size-3" />
-                  </a>
-                ) : null}
+            {!hasArt ? (
+              <div className="flex justify-start pt-2">
+                <SpeciesReferenceLinks
+                  wikipediaUrl={wikipediaUrl}
+                  ebirdUrl={ebirdUrl}
+                  labels={refLabels}
+                />
               </div>
             ) : null}
           </section>

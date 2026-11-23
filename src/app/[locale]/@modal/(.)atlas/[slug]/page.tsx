@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { loadListedSpecies } from "@/lib/guide/load-listed-species";
@@ -49,10 +50,12 @@ export default function InterceptedSpeciesModalPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <PostcardModal>
-      <AnimatedSuspense fallback={<ModalSkeleton />}>
-        <ModalSpeciesBody params={params} />
-      </AnimatedSuspense>
-    </PostcardModal>
+    <Suspense fallback={null}>
+      <PostcardModal>
+        <AnimatedSuspense fallback={<ModalSkeleton />}>
+          <ModalSpeciesBody params={params} />
+        </AnimatedSuspense>
+      </PostcardModal>
+    </Suspense>
   );
 }
