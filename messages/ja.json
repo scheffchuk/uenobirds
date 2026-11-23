@@ -1,49 +1,55 @@
 {
   "Meta": {
     "title": "上野の鳥たち",
-    "description": "上野公園・不忍池の案内図鑑。季節ごとの出現度でコラージュの大きさが変わります。"
+    "description": "上野公園と不忍池で出会える野鳥のガイド。季節ごとに見かけやすい鳥ほど大きく並びます。"
   },
   "Nav": {
     "atlas": "図鑑",
-    "about": "について",
-    "collage": "コラージュ",
-    "backToAtlas": "図鑑",
-    "backToCollage": "コラージュ"
+    "about": "このサイトについて",
+    "collage": "トップ",
+    "backToAtlas": "図鑑に戻る",
+    "backToCollage": "トップに戻る"
   },
   "Home": {
     "title": "上野で出会う鳥たち"
   },
   "Atlas": {
     "title": "図鑑",
-    "subtitle": "{season}に見られる鳥",
-    "emptyTitle": "この季節に該当する案内種はありません",
-    "emptyDescription": "別の季節を試すか、「通年」を選んでください。",
-    "playAudio": "音声を再生",
-    "pauseAudio": "音声を一時停止",
-    "loadingAudio": "音声を読み込み中",
-    "retryAudio": "音声を再試行",
-    "audioUnavailable": "音声なし",
+    "subtitle": {
+      "winter": "冬に出会える鳥たち",
+      "spring": "春に出会える鳥たち",
+      "summer": "夏に出会える鳥たち",
+      "autumn": "秋に出会える鳥たち",
+      "all": "一年を通して出会える鳥たち"
+    },
+    "emptyTitle": "この季節に見られる鳥はまだ登録されていません",
+    "emptyDescription": "ほかの季節を選ぶか、「通年」からすべての鳥を見てみてください。",
+    "playAudio": "鳴き声を再生",
+    "pauseAudio": "鳴き声を一時停止",
+    "loadingAudio": "鳴き声を読み込み中",
+    "retryAudio": "もう一度再生",
+    "audioUnavailable": "鳴き声の録音なし",
     "wikipedia": "Wikipedia",
     "ebird": "eBird",
     "opensNewTab": "新しいタブで開きます"
   },
   "AtlasDetail": {
-    "about": "概要",
-    "spottingTips": "観察のヒント",
-    "prevalence": "季節ごとの出現度",
+    "about": "どんな鳥？",
+    "spottingTips": "見つけるコツ",
+    "prevalence": "季節ごとの見かけやすさ",
     "viewOnWikipedia": "Wikipedia で見る",
     "viewOnEbird": "eBird で見る",
-    "perched": "止まり",
-    "flight": "飛翔",
+    "perched": "止まり姿",
+    "flight": "飛ぶ姿",
     "illustrations": "イラスト",
-    "altPerched": "{name}（止まり）",
-    "altFlight": "{name}（飛翔）",
-    "notFound": "見つかりません"
+    "altPerched": "{name}の止まり姿",
+    "altFlight": "{name}の飛ぶ姿",
+    "notFound": "お探しの鳥が見つかりません"
   },
   "Collage": {
-    "ariaLabel": "鳥のコラージュ",
-    "emptyTitle": "この季節のイラストは準備中です",
-    "emptyDescription": "しばらくしてから見るか、図鑑をご覧ください。",
+    "ariaLabel": "上野の鳥たちのコラージュ",
+    "emptyTitle": "この季節のイラストはまだ準備中です",
+    "emptyDescription": "公開までしばらくお待ちいただくか、図鑑からご覧ください。",
     "browseAtlas": "図鑑を見る"
   },
   "Season": {
@@ -73,38 +79,38 @@
     "zh-tw": "繁體中文"
   },
   "About": {
-    "title": "について",
+    "title": "このサイトについて",
     "place": "上野公園 · 不忍池",
     "sections": {
       "about": {
-        "title": "について",
-        "body": "上野公園をよく歩いていて、そのたびにいろいろな鳥に出会います。かわいい鳥たちの名前がずっと気になっていたので、このサイトを作りました。スタイルと発想は AvianVisitors（theodore.net）を参考にしています。"
+        "title": "このサイトを作ったきっかけ",
+        "body": "上野公園をよく散歩していて、そのたびにいろいろな鳥に出会います。「あの可愛らしい鳥はなんて名前なんだろう」とずっと気になっていたので、この図鑑を作りました。全体の構成やデザインの着想は AvianVisitors（theodore.net）から得ています。"
       },
       "data": {
-        "title": "データについて",
-        "body": "鳥のデータと出現頻度は、eBird に収録された記録をもとに整理しています。各種の図鑑ページには eBird の公式ページへのリンクがあります。"
+        "title": "観察データについて",
+        "body": "載せている鳥の種類や季節ごとの見かけやすさは、eBird に寄せられた観察記録をもとにまとめています。その季節によく出会える鳥ほど大きく表示される仕組みで、図鑑の各ページからは eBird の公式ページにも移動できます。"
       },
       "art": {
         "title": "イラストについて",
-        "body": "切り抜きイラストは花鳥画のスタイルで、解剖の参考図をもとに AI で生成し、人の手で確認しています。ページのレイアウトと操作感も同様に AvianVisitors を参考にしています。"
+        "body": "鳥のイラストは、日本の花鳥画をイメージして作っています。実際の写真をもとに AI で描き起こしたうえで、羽の色や形が合っているか一枚ずつ人の目で確認しています。"
       }
     }
   },
   "Audio": {
     "title": "音声クレジット",
-    "body": "鳥の録音は xeno-canto から選び、元の音源をそのまま使用しています。録音者、カタログ番号、出典、正確な Creative Commons ライセンスを以下に記載しています。",
+    "body": "このサイトで聴ける鳥の鳴き声は、すべて xeno-canto に公開されている録音をそのまま使用しています。各音源の録音者・カタログ番号・出典元・Creative Commons ライセンスは以下の通りです。",
     "recordist": "録音者",
     "catalogue": "カタログ番号",
-    "source": "音源",
+    "source": "元の録音",
     "license": "ライセンス",
-    "none": "音声クレジットは、最初の選択実行後にここへ表示されます。"
+    "none": "現在、公開されている鳴き声の録音はありません。"
   },
   "Offline": {
-    "message": "オフラインです — 再接続しています"
+    "message": "オフラインです — 再接続中…"
   },
   "Error": {
-    "title": "読み込みに失敗しました",
-    "body": "このページを読み込めませんでした。もう一度お試しください。",
-    "retry": "再試行"
+    "title": "ページを読み込めませんでした",
+    "body": "通信状況などを確認のうえ、もう一度お試しください。",
+    "retry": "もう一度試す"
   }
 }

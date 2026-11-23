@@ -1,49 +1,55 @@
 {
   "Meta": {
     "title": "上野的鳥",
-    "description": "上野公園與不忍池的精選鳥類導覽——依季節出現度決定拼貼大小。"
+    "description": "上野公園與不忍池的季節賞鳥圖鑑——越常遇見的鳥，在畫面上就越大隻。"
   },
   "Nav": {
     "atlas": "圖鑑",
-    "about": "關於",
-    "collage": "拼貼",
-    "backToAtlas": "圖鑑",
-    "backToCollage": "拼貼"
+    "about": "關於本站",
+    "collage": "首頁",
+    "backToAtlas": "回到圖鑑",
+    "backToCollage": "回到首頁"
   },
   "Home": {
-    "title": "在上野能遇見的鳥"
+    "title": "在上野遇見的鳥"
   },
   "Atlas": {
     "title": "圖鑑",
-    "subtitle": "在{season}能見到的鳥",
-    "emptyTitle": "此季節沒有導覽物種",
-    "emptyDescription": "試試其他季節，或瀏覽全年。",
-    "playAudio": "播放聲音",
-    "pauseAudio": "暫停聲音",
-    "loadingAudio": "載入聲音中",
-    "retryAudio": "重試聲音",
-    "audioUnavailable": "沒有聲音",
+    "subtitle": {
+      "winter": "冬天能遇見的鳥",
+      "spring": "春天能遇見的鳥",
+      "summer": "夏天能遇見的鳥",
+      "autumn": "秋天能遇見的鳥",
+      "all": "一年四季能遇見的鳥"
+    },
+    "emptyTitle": "這個季節還沒有收錄的鳥類",
+    "emptyDescription": "換個季節看看，或切換到「全年」瀏覽公園裡所有的鳥。",
+    "playAudio": "播放鳥鳴",
+    "pauseAudio": "暫停播放",
+    "loadingAudio": "正在載入音訊",
+    "retryAudio": "重試播放",
+    "audioUnavailable": "暫無錄音",
     "wikipedia": "Wikipedia",
     "ebird": "eBird",
     "opensNewTab": "在新分頁開啟"
   },
   "AtlasDetail": {
-    "about": "簡介",
-    "spottingTips": "觀察提示",
-    "prevalence": "各季節出現度",
+    "about": "認識牠",
+    "spottingTips": "賞鳥小撇步",
+    "prevalence": "各季節常見程度",
     "viewOnWikipedia": "在 Wikipedia 查看",
     "viewOnEbird": "在 eBird 查看",
-    "perched": "棲息",
-    "flight": "飛行",
-    "illustrations": "插圖",
-    "altPerched": "{name}（棲息）",
-    "altFlight": "{name}（飛行）",
-    "notFound": "找不到"
+    "perched": "停棲",
+    "flight": "飛翔",
+    "illustrations": "插畫",
+    "altPerched": "{name}（停棲）",
+    "altFlight": "{name}（飛翔）",
+    "notFound": "找不到這隻鳥"
   },
   "Collage": {
-    "ariaLabel": "鳥類拼貼",
-    "emptyTitle": "此季節的插圖仍在準備中",
-    "emptyDescription": "請稍後再看，或先瀏覽圖鑑。",
+    "ariaLabel": "上野的鳥類拼貼",
+    "emptyTitle": "這個季節的插畫還在準備中",
+    "emptyDescription": "過陣子再來看看，或先逛逛圖鑑吧。",
     "browseAtlas": "瀏覽圖鑑"
   },
   "Season": {
@@ -64,7 +70,7 @@
   "Footer": {
     "credit": "靈感來自",
     "createdBy": "製作",
-    "audioCredits": "聲音致謝"
+    "audioCredits": "音訊致謝"
   },
   "LocaleSwitcher": {
     "label": "語言",
@@ -73,38 +79,38 @@
     "zh-tw": "繁體中文"
   },
   "About": {
-    "title": "關於",
+    "title": "關於本站",
     "place": "上野公園 · 不忍池",
     "sections": {
       "about": {
-        "title": "關於",
-        "body": "我常逛上野公園，時常會見到不同的鳥兒。我一直好奇那些可愛的鳥叫什麼名字，於是做了這個網站。風格與構思參考了 AvianVisitors（theodore.net）。"
+        "title": "做這個網站的契機",
+        "body": "我很常在上野公園散步，每次都會遇見各式各樣的鳥。因為一直很好奇那些可愛的小傢伙叫什麼名字，便做了這個網站。版面與互動的靈感來自 AvianVisitors（theodore.net）。"
       },
       "data": {
         "title": "資料來源",
-        "body": "鳥類資料和出現頻率整理自 eBird 收錄的資料。每種鳥的圖鑑頁都附有 eBird 官方頁面連結。"
+        "body": "鳥種清單與各季節的常見程度，都是根據 eBird 上的賞鳥紀錄整理而成。在某個季節越常遇見的鳥，在畫面上就會越大隻；每種鳥的圖鑑頁也都附有 eBird 官方連結，方便你進一步認識牠們。"
       },
       "art": {
-        "title": "插圖",
-        "body": "剪影插圖採用花鳥畫風格，基於解剖參考圖由 AI 生成，並經過人工審核。頁面排版與互動同樣參考了 AvianVisitors。"
+        "title": "插畫",
+        "body": "每隻鳥的插畫都以日本傳統花鳥畫的風格繪製，先參考真實鳥類照片由 AI 生成，再逐張經過人工確認細節，確保外型與羽色貼近本尊。"
       }
     }
   },
   "Audio": {
-    "title": "聲音致謝",
-    "body": "鳥類錄音選自 xeno-canto，並保持來源音檔不變。以下列出每段錄音的錄音者、目錄編號、來源與完整 Creative Commons 授權。",
+    "title": "音訊致謝",
+    "body": "本站收錄的鳥鳴皆來自 xeno-canto，並保留原始錄音未經修改。以下列出每段錄音的錄音者、編號、來源與 Creative Commons 授權資訊。",
     "recordist": "錄音者",
-    "catalogue": "目錄編號",
-    "source": "來源錄音",
-    "license": "授權",
-    "none": "完成第一次選擇後，聲音致謝會顯示在這裡。"
+    "catalogue": "編號",
+    "source": "原始錄音",
+    "license": "授權條款",
+    "none": "目前尚未收錄任何鳥鳴錄音。"
   },
   "Offline": {
-    "message": "目前離線 — 正在重新連線"
+    "message": "目前處於離線狀態 — 重新連線中…"
   },
   "Error": {
-    "title": "發生錯誤",
-    "body": "無法載入此頁。請再試一次。",
-    "retry": "重試"
+    "title": "頁面載入失敗",
+    "body": "目前無法顯示這個頁面，請稍後再試一次。",
+    "retry": "再試一次"
   }
 }

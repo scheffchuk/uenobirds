@@ -22,10 +22,9 @@ export async function generateMetadata({
   const season = await requireSeasonParam(params, "/atlas");
   const tMeta = await getTranslations("Meta");
   const t = await getTranslations("Atlas");
-  const tSeason = await getTranslations("Season");
   return {
     title: `${t("title")} · ${tMeta("title")}`,
-    description: t("subtitle", { season: tSeason(season) }),
+    description: t(`subtitle.${season}`),
   };
 }
 

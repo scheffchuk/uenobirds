@@ -1,23 +1,29 @@
 {
   "Meta": {
     "title": "Birds in Ueno",
-    "description": "A curated bird guide for Ueno Park and Shinobazu Pond — collage sized by seasonal Prevalence."
+    "description": "A seasonal guide to the wild birds of Ueno Park and Shinobazu Pond — the more often a bird visits, the larger it appears."
   },
   "Nav": {
     "atlas": "Atlas",
     "about": "About",
-    "collage": "Collage",
-    "backToAtlas": "Atlas",
-    "backToCollage": "Collage"
+    "collage": "Home",
+    "backToAtlas": "Back to Atlas",
+    "backToCollage": "Back to home"
   },
   "Home": {
     "title": "Birds you’ll meet in Ueno"
   },
   "Atlas": {
     "title": "Atlas",
-    "subtitle": "Birds you can see in {season}",
-    "emptyTitle": "No Guide species for this Season",
-    "emptyDescription": "Try another season, or browse All.",
+    "subtitle": {
+      "winter": "Birds you might spot in winter",
+      "spring": "Birds you might spot in spring",
+      "summer": "Birds you might spot in summer",
+      "autumn": "Birds you might spot in autumn",
+      "all": "Every bird you might spot throughout the year"
+    },
+    "emptyTitle": "No birds listed for this season",
+    "emptyDescription": "Try another season, or switch to All year to see every bird in the park.",
     "playAudio": "Play audio",
     "pauseAudio": "Pause audio",
     "loadingAudio": "Loading audio",
@@ -30,20 +36,20 @@
   "AtlasDetail": {
     "about": "About",
     "spottingTips": "Spotting tips",
-    "prevalence": "Prevalence by Season",
+    "prevalence": "When you’re most likely to see it",
     "viewOnWikipedia": "View on Wikipedia",
     "viewOnEbird": "View on eBird",
     "perched": "Perched",
-    "flight": "Flight",
+    "flight": "In flight",
     "illustrations": "Illustrations",
-    "altPerched": "{name} perched",
-    "altFlight": "{name} in flight",
-    "notFound": "Not found"
+    "altPerched": "{name}, perched",
+    "altFlight": "{name}, in flight",
+    "notFound": "Bird not found"
   },
   "Collage": {
-    "ariaLabel": "Bird collage",
-    "emptyTitle": "Illustrations for this season are still being prepared",
-    "emptyDescription": "Check back soon, or browse the Atlas.",
+    "ariaLabel": "Seasonal collage of birds in Ueno",
+    "emptyTitle": "No illustrations for this season yet",
+    "emptyDescription": "Check back soon, or explore the full list in the Atlas.",
     "browseAtlas": "Browse the Atlas"
   },
   "Season": {
@@ -63,7 +69,7 @@
   },
   "Footer": {
     "credit": "Inspired by",
-    "createdBy": "Created by",
+    "createdBy": "Made by",
     "audioCredits": "Audio credits"
   },
   "LocaleSwitcher": {
@@ -77,34 +83,34 @@
     "place": "Ueno Park · Shinobazu Pond",
     "sections": {
       "about": {
-        "title": "About",
-        "body": "I hang around Ueno Park a lot and keep running into different birds. I’ve always wondered what those cute birds are called — so I made this site. The style and idea draw from AvianVisitors (theodore.net)."
+        "title": "Why I made this",
+        "body": "I spend a lot of time walking through Ueno Park, and I’m always running into birds I don’t recognize. I kept wondering what these little neighbors were called, so I put together this guide to help put names to faces. The layout and visual idea are inspired by AvianVisitors (theodore.net)."
       },
       "data": {
-        "title": "Data source",
-        "body": "Bird data and how often they show up are compiled from records on eBird. Every atlas page links to the official eBird species page."
+        "title": "Where the sightings come from",
+        "body": "The species list and seasonal frequencies are compiled from community sightings on eBird. Birds that visit more often in a given season appear larger on the home page, and every entry in the Atlas links to its official eBird page if you want to dig deeper."
       },
       "art": {
         "title": "Illustrations",
-        "body": "The cutouts use a bird-and-flower print style. They’re AI-generated from anatomy references and reviewed by hand. The page layout and interaction also take cues from AvianVisitors."
+        "body": "Each bird is illustrated in the style of traditional Japanese kachō-e (bird-and-flower prints). The artwork is generated with AI from real reference photos of each species, then checked by hand for accuracy."
       }
     }
   },
   "Audio": {
     "title": "Audio credits",
-    "body": "Bird recordings are selected from xeno-canto and remain unchanged from the source. Each recording’s recordist, catalogue number, source, and exact Creative Commons licence are listed below.",
+    "body": "All bird calls on this site come directly from xeno-canto, shared unmodified from the original recordings. Below you’ll find the recordist, catalog number, source link, and Creative Commons license for each track.",
     "recordist": "Recordist",
-    "catalogue": "Catalogue",
-    "source": "Source recording",
-    "license": "Licence",
-    "none": "Audio credits will appear here after the first selection run."
+    "catalogue": "Catalog no.",
+    "source": "Original recording",
+    "license": "License",
+    "none": "No bird recordings have been added yet."
   },
   "Offline": {
-    "message": "You're offline — reconnecting"
+    "message": "You’re offline — reconnecting…"
   },
   "Error": {
     "title": "Something went wrong",
-    "body": "This page could not be loaded. Please try again.",
+    "body": "We couldn’t load this page right now. Give it another try.",
     "retry": "Try again"
   }
 }

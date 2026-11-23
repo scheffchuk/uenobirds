@@ -24,9 +24,8 @@ export async function AtlasListView({
   season: SeasonFilter;
   pickerPath?: SeasonPickerPath;
 }) {
-  const [t, tSeason, localeRaw] = await Promise.all([
+  const [t, localeRaw] = await Promise.all([
     getTranslations("Atlas"),
-    getTranslations("Season"),
     getLocale(),
   ]);
   const locale = localeRaw as AppLocale;
@@ -45,7 +44,7 @@ export async function AtlasListView({
   return (
     <div className="group flex flex-col gap-8">
       <p className="text-center text-sm text-ink-soft">
-        {t("subtitle", { season: tSeason(season) })}
+        {t(`subtitle.${season}`)}
       </p>
 
       <div className="flex justify-center">

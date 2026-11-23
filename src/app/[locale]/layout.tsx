@@ -17,7 +17,7 @@ import { routing, type AppLocale } from "@/i18n/routing";
 export const metadata: Metadata = {
   title: "Birds in Ueno",
   description:
-    "A curated bird guide for Ueno Park and Shinobazu Pond — collage sized by seasonal Prevalence.",
+    "A seasonal guide to the wild birds of Ueno Park and Shinobazu Pond — the more often a bird visits, the larger it appears.",
   appleWebApp: {
     title: "Birds in Ueno",
   },
