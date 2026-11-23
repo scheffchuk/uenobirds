@@ -11,6 +11,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { selectForAtlas, type AtlasListSource } from "@/lib/atlas/select";
+import { peakPrevalenceOf } from "@/lib/atlas/sort";
 import { commonNameForLocale } from "@/lib/locale/species";
 import type { SeasonFilter } from "@/lib/season/types";
 import type { AppLocale } from "@/i18n/routing";
@@ -31,6 +32,9 @@ export async function AtlasListView({
   ]);
   const locale = localeRaw as AppLocale;
   const rows = selectForAtlas(species, season);
+  const peakBySlug = new Map(
+    species.map((sp) => [sp.slug, peakPrevalenceOf(sp.prevalence)]),
+  );
   const cardLabels = {
     play: t("playAudio"),
     pause: t("pauseAudio"),
@@ -62,27 +66,34 @@ export async function AtlasListView({
         <AtlasPlaybackProvider>
           <AtlasSearch
             key={season}
-            items={rows.map((row, index) => ({
-              slug: row.slug,
-              names: [
-                row.comNameEn,
-                row.comNameJa,
-                row.comNameZhTw,
-                row.sciName,
-              ].join(" "),
-              content: (
-                <AtlasSpeciesCard
-                  slug={row.slug}
-                  comName={commonNameForLocale(row, locale)}
-                  sciName={row.sciName}
-                  imageUrl={row.imageUrl}
-                  index={index}
-                  season={season}
-                  audio={row.audio}
-                  labels={cardLabels}
-                />
-              ),
-            }))}
+            items={rows.map((row, index) => {
+              const displayName = commonNameForLocale(row, locale);
+              return {
+                slug: row.slug,
+                displayName,
+                prevalence: row.prevalence,
+                peakPrevalence: peakBySlug.get(row.slug) ?? row.prevalence,
+                names: [
+                  row.comNameEn,
+                  row.comNameJa,
+                  row.comNameZhTw,
+                  row.sciName,
+                ].join(" "),
+                content: (
+                  <AtlasSpeciesCard
+                    slug={row.slug}
+                    comName={displayName}
+                    sciName={row.sciName}
+                    imageUrl={row.imageUrl}
+                    prevalence={row.prevalence}
+                    index={index}
+                    season={season}
+                    audio={row.audio}
+                    labels={cardLabels}
+                  />
+                ),
+              };
+            })}
           />
         </AtlasPlaybackProvider>
       )}

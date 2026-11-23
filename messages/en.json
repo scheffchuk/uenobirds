@@ -39,7 +39,11 @@
     "results": "{count, plural, one {# bird} other {# birds}}",
     "noResultsTitle": "No matching birds",
     "noResultsDescription": "Try an English, Japanese, Chinese, or scientific name.",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "sortLabel": "Sort birds",
+    "sortPrevalence": "Most common",
+    "sortAlpha": "A to Z",
+    "sortPeak": "Year-round peak"
   },
   "AtlasDetail": {
     "about": "About",

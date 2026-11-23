@@ -39,7 +39,11 @@
     "results": "{count} 種",
     "noResultsTitle": "該当する鳥が見つかりません",
     "noResultsDescription": "日本語・英語・中国語の名前、または学名で検索してみてください。",
-    "clearSearch": "検索をクリア"
+    "clearSearch": "検索をクリア",
+    "sortLabel": "並び替え",
+    "sortPrevalence": "見かけやすさ順",
+    "sortAlpha": "名前順",
+    "sortPeak": "通年ピーク順"
   },
   "AtlasDetail": {
     "about": "どんな鳥？",

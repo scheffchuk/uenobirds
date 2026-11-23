@@ -20,6 +20,7 @@ export function AtlasSpeciesCard({
   comName,
   sciName,
   imageUrl,
+  prevalence,
   index,
   season,
   audio,
@@ -29,6 +30,7 @@ export function AtlasSpeciesCard({
   comName: string;
   sciName: string;
   imageUrl?: string;
+  prevalence?: number;
   index: number;
   season: SeasonFilter;
   audio?: PublicAudio;
@@ -39,16 +41,24 @@ export function AtlasSpeciesCard({
   return (
     <Card
       size="sm"
-      className="atlas-card-enter relative h-full flex-row items-center gap-0 overflow-hidden py-2 pr-12 ring-0 shadow-[var(--raised)] sm:flex-col sm:items-stretch sm:py-3 sm:pr-0"
+      className="atlas-card-enter edo-plate-card relative h-full flex-row items-center gap-0 overflow-hidden py-2 pr-12 ring-0 sm:flex-col sm:items-stretch sm:p-2"
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
     >
       <HoverPrefetchLink
         eager={eager}
         href={hrefWithSeason(`/atlas/${slug}`, season)}
-        className="atlas-card-detail flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:block"
+        className="atlas-card-detail flex min-w-0 flex-1 items-center gap-3 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:flex sm:flex-col sm:items-stretch sm:gap-0"
       >
-        <div className="w-24 shrink-0 pl-3 sm:w-auto sm:px-4 sm:pt-1">
-          <div className="relative aspect-square w-full overflow-hidden">
+        <div className="w-24 shrink-0 pl-2 sm:w-auto sm:p-0">
+          <div className="edo-plate-well relative aspect-square w-full overflow-hidden">
+            {prevalence !== undefined ? (
+              <span
+                aria-hidden="true"
+                className="edo-hanko-seal pointer-events-none absolute top-2 right-2 z-10 hidden sm:inline-flex"
+              >
+                {prevalence}
+              </span>
+            ) : null}
             {imageUrl ? (
               <SpeciesArtTransition slug={slug}>
                 <Image
@@ -69,16 +79,26 @@ export function AtlasSpeciesCard({
             )}
           </div>
         </div>
-        <CardHeader className="min-w-0 flex-1 gap-1 px-0 py-2 sm:px-4 sm:pt-3 sm:pb-0">
-          <CardTitle className="atlas-card-title line-clamp-2 underline-offset-4 decoration-hairline">
+        <CardHeader className="min-w-0 flex-1 gap-0.5 px-0 py-1.5 sm:px-2.5 sm:pt-3 sm:pb-1">
+          <CardTitle className="atlas-card-title line-clamp-2 font-heading text-base leading-snug underline-offset-4 decoration-hairline">
             {comName}
           </CardTitle>
-          <CardDescription className="truncate text-xs italic">
+          <CardDescription className="truncate font-mono text-[10.5px] tracking-[0.03em] text-ink-soft italic">
             {sciName}
           </CardDescription>
         </CardHeader>
       </HoverPrefetchLink>
-      <div className="absolute right-2 flex size-10 items-center justify-center sm:static sm:mt-2 sm:mr-3 sm:ml-auto">
+      <div className="absolute right-2 flex size-10 items-center justify-center sm:static sm:mt-auto sm:flex sm:w-full sm:items-center sm:justify-between sm:border-t sm:border-hairline/70 sm:px-2.5 sm:pt-1.5 sm:pb-0.5">
+        {prevalence !== undefined ? (
+          <span
+            aria-hidden="true"
+            className="hidden font-mono text-[9.5px] tracking-[0.14em] text-ink-soft uppercase tabular-nums sm:inline"
+          >
+            № {String(index + 1).padStart(2, "0")}
+          </span>
+        ) : (
+          <span className="hidden sm:inline" aria-hidden="true" />
+        )}
         <AtlasAudioControl
           slug={slug}
           audioUrl={audio?.url}

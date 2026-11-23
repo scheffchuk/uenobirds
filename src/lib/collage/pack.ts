@@ -173,7 +173,7 @@ function tryPlaceMasked(
   );
 
   for (const tile of ordered) {
-    const { bw, bh, pts } = rasterizeTilePoints(tile, decodedMasks);
+    const { pts } = rasterizeTilePoints(tile, decodedMasks);
     const maxGx = Math.floor((viewportW - tile.width) / CELL);
     const maxGy = Math.floor((viewportH - tile.height) / CELL);
     if (maxGx < 0 || maxGy < 0) return null;

@@ -79,8 +79,8 @@ export function SpeciesVoicePlayer({
   const bars = useMemo(() => seedBars(slug), [slug]);
 
   useEffect(() => {
+    const el = audioRef.current;
     return () => {
-      const el = audioRef.current;
       if (el) {
         attemptRef.current += 1;
         el.pause();

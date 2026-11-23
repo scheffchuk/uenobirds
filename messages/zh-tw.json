@@ -39,7 +39,11 @@
     "results": "{count} 種鳥",
     "noResultsTitle": "找不到符合的鳥類",
     "noResultsDescription": "試試中文、日文、英文鳥名或學名。",
-    "clearSearch": "清除搜尋"
+    "clearSearch": "清除搜尋",
+    "sortLabel": "排序方式",
+    "sortPrevalence": "依常見程度",
+    "sortAlpha": "依名稱排序",
+    "sortPeak": "全年高峰優先"
   },
   "AtlasDetail": {
     "about": "認識牠",
