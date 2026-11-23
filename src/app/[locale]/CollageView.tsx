@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
 import { hrefWithSeason } from "@/lib/season/url";
+import { hitTestCollageTiles } from "@/lib/collage/mask";
 import type { CollageArt, SeasonTile } from "@/lib/collage/types";
 import type { SeasonFilter } from "@/lib/season/types";
 import { commonNameForLocale } from "@/lib/locale/species";
@@ -18,6 +19,7 @@ import { SeasonLink } from "@/components/season/SeasonLink";
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { SpeciesArtTransition } from "@/components/site/species-art-transition";
 import type { AppLocale } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 
 const COLLAGE_IMAGE_SIZES = "(max-width: 767px) 30vw, 12vw";
 
@@ -41,14 +43,70 @@ export function CollageView({
 }) {
   const t = useTranslations("Collage");
   const locale = useLocale() as AppLocale;
-  const [hovered, setHovered] = useState<CollageArt | null>(null);
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
+  const decodedCacheRef = useRef(new Map<string, Uint8Array>());
 
-  const artBySlug = new Map(art.map((item) => [item.slug, item]));
+  const artBySlug = useMemo(
+    () => new Map(art.map((item) => [item.slug, item])),
+    [art],
+  );
+  const hovered = hoveredSlug ? (artBySlug.get(hoveredSlug) ?? null) : null;
   const hoverName = hovered ? commonNameForLocale(hovered, locale) : null;
   const prioritySlug = lcpSlug(tiles);
 
+  const hitTestAt = (clientX: number, clientY: number): string | null => {
+    const stage = stageRef.current;
+    if (!stage) return null;
+    const rect = stage.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+
+    const pctX = ((clientX - rect.left) / rect.width) * 100;
+    const pctY = ((clientY - rect.top) / rect.height) * 100;
+    const mode = rect.width >= rect.height ? "landscape" : "portrait";
+
+    return hitTestCollageTiles(
+      tiles.map((tile) => ({
+        slug: tile.slug,
+        rect: tile[mode],
+        mask: artBySlug.get(tile.slug)?.mask,
+      })),
+      pctX,
+      pctY,
+      decodedCacheRef.current,
+    );
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
+    const hit = hitTestAt(event.clientX, event.clientY);
+    if (hit !== hoveredSlug) {
+      setHoveredSlug(hit);
+    }
+  };
+
+  const handleStageClick = (event: MouseEvent<HTMLDivElement>) => {
+    // Let direct keyboard activation on focused anchor links proceed normally.
+    if (event.target instanceof Element && event.target.closest("a")) {
+      return;
+    }
+    const hit = hitTestAt(event.clientX, event.clientY);
+    if (!hit) return;
+    const anchor = linkRefs.current.get(hit);
+    if (!anchor) return;
+    if (event.metaKey || event.ctrlKey) {
+      window.open(anchor.href, "_blank", "noopener");
+      return;
+    }
+    anchor.click();
+  };
+
   return (
-    <div className="group collage-frame" onMouseLeave={() => setHovered(null)}>
+    <div
+      className="group collage-frame"
+      onPointerLeave={() => setHoveredSlug(null)}
+    >
       {tiles.length === 0 ? (
         <Empty className="absolute inset-0 border-0">
           <EmptyHeader>
@@ -69,8 +127,15 @@ export function CollageView({
         </Empty>
       ) : (
         <div
-          className="collage-stage group-has-[[data-filtering]]:opacity-60 group-has-[[data-filtering]]:transition-opacity"
+          ref={stageRef}
+          className={cn(
+            "collage-stage group-has-[[data-filtering]]:opacity-60 group-has-[[data-filtering]]:transition-opacity",
+            hoveredSlug ? "cursor-pointer" : "cursor-default",
+          )}
           aria-label={t("ariaLabel")}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => setHoveredSlug(null)}
+          onClick={handleStageClick}
         >
           {tiles.map((tile) => {
             const item = artBySlug.get(tile.slug);
@@ -78,12 +143,24 @@ export function CollageView({
             const name = commonNameForLocale(item, locale);
             const eager = tile.portrait.y < 45;
             const priority = tile.slug === prioritySlug;
+            const isActive = hoveredSlug === tile.slug;
             return (
               <HoverPrefetchLink
                 key={tile.slug}
-                eager={eager}
+                ref={(node: HTMLAnchorElement | null) => {
+                  if (node) {
+                    linkRefs.current.set(tile.slug, node);
+                  } else {
+                    linkRefs.current.delete(tile.slug);
+                  }
+                }}
+                eager={eager || isActive}
                 href={hrefWithSeason(`/atlas/${tile.slug}`, season)}
-                className="collage-tile hover:z-10"
+                data-hovered={isActive ? "" : undefined}
+                className={cn(
+                  "collage-tile pointer-events-none rounded-lg outline-none focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring/60",
+                  isActive && "is-hover",
+                )}
                 style={
                   {
                     "--tile-x": `${tile.portrait.x}%`,
@@ -96,8 +173,10 @@ export function CollageView({
                     "--tile-h-lg": `${tile.landscape.height}%`,
                   } as CSSProperties
                 }
-                onMouseEnter={() => setHovered(item)}
-                onFocus={() => setHovered(item)}
+                onFocus={() => setHoveredSlug(tile.slug)}
+                onBlur={() =>
+                  setHoveredSlug((prev) => (prev === tile.slug ? null : prev))
+                }
               >
                 <SpeciesArtTransition slug={tile.slug}>
                   <Image
@@ -105,7 +184,7 @@ export function CollageView({
                     alt={name}
                     fill
                     sizes={COLLAGE_IMAGE_SIZES}
-                    className="object-contain"
+                    className="collage-tile-img object-contain"
                     loading={eager ? "eager" : "lazy"}
                     fetchPriority={priority ? "high" : "auto"}
                   />

@@ -1,7 +1,8 @@
 import type { SeasonFilter } from "@/lib/season/types";
 import type { SeasonalPrevalence } from "@/lib/guide/types";
+import type { SilhouetteMask } from "./mask";
 
-/** Row from `listForCollage` — one cutout URL + aspect, ready to pack. */
+/** Row from `listForCollage` — one cutout URL + aspect + optional silhouette mask. */
 export type CollageSpecies = {
   slug: string;
   sciName: string;
@@ -11,6 +12,7 @@ export type CollageSpecies = {
   prevalence: SeasonalPrevalence;
   url: string;
   aspect: number;
+  mask?: SilhouetteMask;
 };
 
 export type CollageBird = Omit<CollageSpecies, "prevalence"> & {
@@ -43,10 +45,10 @@ export type SeasonLayout = {
   tiles: SeasonTile[];
 };
 
-/** Everything needed to draw a tile, listed once and shared across Seasons. */
+/** Everything needed to draw and hit-test a tile, listed once and shared across Seasons. */
 export type CollageArt = Pick<
   CollageSpecies,
-  "slug" | "comNameEn" | "comNameJa" | "comNameZhTw" | "url"
+  "slug" | "comNameEn" | "comNameJa" | "comNameZhTw" | "url" | "mask"
 >;
 
 export type CollageLayouts = {

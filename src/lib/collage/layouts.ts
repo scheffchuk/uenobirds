@@ -31,6 +31,7 @@ function birdsForSeason(
       prevalence,
       url: record.url,
       aspect: record.aspect,
+      ...(record.mask ? { mask: record.mask } : {}),
     });
   }
   return selected;
@@ -128,6 +129,7 @@ export function buildCollageLayouts(species: CollageSpecies[]): CollageLayouts {
         comNameJa: bird.comNameJa,
         comNameZhTw: bird.comNameZhTw,
         url: bird.url,
+        ...(bird.mask ? { mask: bird.mask } : {}),
       });
     }
     seasons[season] = layoutForSeason(birds);

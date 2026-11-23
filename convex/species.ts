@@ -80,6 +80,12 @@ const atlasListRecordValidator = v.object({
   wikipedia: v.optional(speciesWikipediaValidator),
 });
 
+const maskValidator = v.object({
+  w: v.number(),
+  h: v.number(),
+  bits: v.string(),
+});
+
 const collageSpeciesValidator = v.object({
   slug: v.string(),
   sciName: v.string(),
@@ -89,6 +95,7 @@ const collageSpeciesValidator = v.object({
   prevalence: prevalenceValidator,
   url: v.string(),
   aspect: v.number(),
+  mask: v.optional(maskValidator),
 });
 
 const speciesCopyValidator = v.object({

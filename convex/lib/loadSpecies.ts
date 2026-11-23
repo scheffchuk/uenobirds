@@ -159,6 +159,7 @@ export async function loadSpeciesForCollage(ctx: QueryCtx) {
       const { perchUrl, flightUrl } = await resolveIllustrationUrls(ctx, sp);
       const url = perchUrl ?? flightUrl;
       if (!url) return null;
+      const mask = perchUrl ? sp.maskPerch : sp.maskFlight;
       return {
         slug: sp.slug,
         sciName: sp.sciName,
@@ -168,6 +169,7 @@ export async function loadSpeciesForCollage(ctx: QueryCtx) {
         prevalence: await loadPrevalenceForSpecies(ctx, sp._id),
         url,
         aspect: aspectFromDims(perchUrl ? sp.dimsPerch : sp.dimsFlight),
+        ...(mask ? { mask } : {}),
       };
     }),
   );
